@@ -336,7 +336,7 @@
             document.getElementById('resultArea').innerHTML = '';
             
             try {
-                const callResponse = await fetch(`${HF_SPACE_URL}/gradio_api/call/search_text`, {
+                const callResponse = await fetch(`${HF_SPACE_URL}/gradio_api/call/predict`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ data: [query] })
@@ -345,7 +345,7 @@
                 const callData = await callResponse.json();
                 const eventId = callData.event_id;
                 
-                const resultResponse = await fetch(`${HF_SPACE_URL}/gradio_api/call/search_text/${eventId}`);
+                const resultResponse = await fetch(`${HF_SPACE_URL}/gradio_api/call/predict/${eventId}`);
                 const text = await resultResponse.text();
                 
                 document.getElementById('loadingArea').innerHTML = '';
@@ -354,10 +354,15 @@
                 if (!dataLine) { alert('Erreur'); return; }
                 
                 const raw = JSON.parse(dataLine.substring(6));
-                let result;
-                try { result = JSON.parse(raw[0]); } catch { result = { poubelle: raw[1] }; }
+                let poubelle = raw[0] || raw[1] || '';
+                let bin = 'gray';
+                for (const [key, value] of Object.entries(BIN_MAP)) {
+                    if (poubelle.includes(key)) {
+                        bin = value;
+                        break;
+                    }
+                }
                 
-                const bin = BIN_MAP[result.poubelle] || 'gray';
                 const data = DB[bin];
                 
                 document.getElementById('resultArea').innerHTML = `
@@ -365,7 +370,7 @@
                         <span class="ai-badge">&#128640; Resultat IA</span>
                         <div class="icon">${data.icon}</div>
                         <div class="bin-name">${data.name}</div>
-                        <div class="tips">${result.conseil || data.tips}</div>
+                        <div class="tips">${data.tips}</div>
                     </div>
                 `;
                 
