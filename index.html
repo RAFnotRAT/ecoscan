@@ -27,16 +27,8 @@
             text-align: center;
             margin-bottom: 25px;
         }
-        .header h1 { 
-            font-size: 32px; 
-            color: #2e7d32;
-            margin-bottom: 10px;
-        }
-        .header p { 
-            font-size: 14px; 
-            color: #666;
-            line-height: 1.5;
-        }
+        .header h1 { font-size: 32px; color: #2e7d32; margin-bottom: 10px; }
+        .header p { font-size: 14px; color: #666; line-height: 1.5; }
         
         .search-box {
             background: white;
@@ -45,11 +37,7 @@
             margin-bottom: 20px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.1);
         }
-        .search-box h3 {
-            font-size: 14px;
-            color: #888;
-            margin-bottom: 10px;
-        }
+        .search-box h3 { font-size: 14px; color: #888; margin-bottom: 10px; }
         .search-input {
             width: 100%;
             padding: 15px;
@@ -72,8 +60,6 @@
         }
         .btn-green { background: #4caf50; color: white; }
         .btn-red { background: #ef5350; color: white; }
-        .btn-green:active { background: #43a047; }
-        .btn-red:active { background: #e53935; }
         
         .photo-box {
             background: white;
@@ -83,11 +69,7 @@
             box-shadow: 0 2px 15px rgba(0,0,0,0.1);
             text-align: center;
         }
-        .photo-box h3 {
-            font-size: 14px;
-            color: #888;
-            margin-bottom: 15px;
-        }
+        .photo-box h3 { font-size: 14px; color: #888; margin-bottom: 15px; }
         .upload-area {
             border: 3px dashed #4caf50;
             border-radius: 15px;
@@ -95,14 +77,9 @@
             cursor: pointer;
             margin-bottom: 15px;
         }
-        .upload-area:active { transform: scale(0.98); }
         .upload-area .icon { font-size: 50px; }
         .upload-area p { color: #888; margin-top: 10px; }
-        .upload-area img {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 10px;
-        }
+        .upload-area img { max-width: 100%; max-height: 200px; border-radius: 10px; }
         
         .spinner {
             width: 40px;
@@ -125,17 +102,7 @@
         }
         .result-card .icon { font-size: 60px; margin-bottom: 10px; }
         .result-card .bin-name { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
-        .result-card .desc { font-size: 14px; color: #666; margin-bottom: 10px; }
         .result-card .tips { font-size: 13px; color: #888; font-style: italic; }
-        .result-card .ai-badge {
-            background: #9c27b0;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 15px;
-            font-size: 12px;
-            display: inline-block;
-            margin-bottom: 15px;
-        }
         
         .yellow { background: linear-gradient(135deg, #fff9c4, #fff176); border: 3px solid #fbc02d; }
         .blue { background: linear-gradient(135deg, #bbdefb, #90caf9); border: 3px solid #1976d2; }
@@ -150,31 +117,19 @@
             padding: 20px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.1);
         }
-        .examples h3 {
-            font-size: 16px;
-            color: #2e7d32;
-            margin-bottom: 15px;
-        }
-        .examples-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
+        .examples h3 { font-size: 16px; color: #2e7d32; margin-bottom: 15px; }
+        .examples-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .example-item {
             background: #f5f5f5;
             border-radius: 10px;
             padding: 15px 5px;
             text-align: center;
+            cursor: pointer;
         }
         .example-item .emoji { font-size: 30px; }
         .example-item .name { font-size: 11px; margin-top: 5px; color: #666; }
         
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #888;
-            font-size: 12px;
-        }
+        .footer { text-align: center; padding: 20px; color: #888; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -186,8 +141,9 @@
         
         <div class="search-box">
             <h3>Recherche par texte</h3>
-            <input type="text" class="search-input" id="searchInput" placeholder="Ex: bouteille plastique, journal, peau de banane...">
-            <button class="btn btn-green" onclick="searchWithAI()">&#128640; Rechercher</button>
+            <input type="text" class="search-input" id="searchInput" placeholder="Ex: bouteille, journal, stylo...">
+            <button class="btn btn-green" id="searchBtn">Rechercher</button>
+            <div id="resultArea"></div>
         </div>
         
         <div class="photo-box">
@@ -196,192 +152,130 @@
                 <div class="icon">&#128247;</div>
                 <p>Cliquez pour choisir une photo</p>
             </div>
-            <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(this.files[0])">
-            <div id="previewArea"></div>
-            <div id="loadingArea"></div>
-            <div id="resultArea"></div>
+            <input type="file" id="fileInput" accept="image/*" style="display:none">
+            <div id="photoResult"></div>
         </div>
         
         <div class="examples">
-            <h3>Exemples d'objets</h3>
+            <h3>Exemples</h3>
             <div class="examples-grid">
-                <div class="example-item"><div class="emoji">&#128154;</div><div class="name">Bouteille</div></div>
-                <div class="example-item"><div class="emoji">&#128240;</div><div class="name">Journal</div></div>
-                <div class="example-item"><div class="emoji">&#129389;</div><div class="name">Bocal</div></div>
-                <div class="example-item"><div class="emoji">&#127822;</div><div class="name">Banane</div></div>
-                <div class="example-item"><div class="emoji">&#128684;</div><div class="name">Cigarette</div></div>
-                <div class="example-item"><div class="emoji">&#128187;</div><div class="name">Ordinateur</div></div>
+                <div class="example-item" data-item="bouteille"><div class="emoji">&#128154;</div><div class="name">Bouteille</div></div>
+                <div class="example-item" data-item="journal"><div class="emoji">&#128240;</div><div class="name">Journal</div></div>
+                <div class="example-item" data-item="stylo"><div class="emoji">&#128394;</div><div class="name">Stylo</div></div>
+                <div class="example-item" data-item="banane"><div class="emoji">&#127822;</div><div class="name">Banane</div></div>
+                <div class="example-item" data-item="téléphone"><div class="emoji">&#128241;</div><div class="name">Téléphone</div></div>
+                <div class="example-item" data-item="verre"><div class="emoji">&#128154;</div><div class="name">Verre</div></div>
             </div>
         </div>
         
-        <div class="footer">
-            EcoScan - Projet SVT
-        </div>
+        <div class="footer">EcoScan - Projet SVT</div>
     </div>
     
     <script>
-        let selectedImage = null;
-        
         const DB = {
-            yellow: { name: 'Poubelle Jaune', icon: '&#128462;', tips: 'Videz et aplatissez. Retirez les films.' },
-            blue: { name: 'Poubelle Bleue', icon: '&#128462;', tips: 'Ne pas froisser. Pas de papier sale.' },
-            green: { name: 'Poubelle Verte', icon: '&#128462;', tips: 'Retirez les bouchons. Ne cassez pas.' },
-            brown: { name: 'Poubelle Brune', icon: '&#128462;', tips: 'Utilisez un sac compostable.' },
-            gray: { name: 'Poubelle Grise', icon: '&#128462;', tips: 'Dernier recours.' },
-            orange: { name: 'Dechets Speciaux', icon: '&#9888;', tips: 'Aller en dechetterie.' }
+            jaune: { name: 'Poubelle Jaune', icon: '&#128462;', tips: 'Videz et aplatissez. Retirez les films.', words: ['bouteille', 'plastique', 'canette', 'conserve', 'sac', 'emballage', 'carton', 'métal', 'aluminium', 'film', 'gobelet', 'pot', 'barquette', 'brique', 'couvercle', 'dosette'] },
+            bleu: { name: 'Poubelle Bleue', icon: '&#128462;', tips: 'Ne pas froisser. Pas de papier sale.', words: ['journal', 'magazine', 'papier', 'livre', 'cahier', 'enveloppe', 'prospectus', 'catalogue', 'revue'] },
+            vert: { name: 'Poubelle Verte', icon: '&#128462;', tips: 'Retirez les bouchons.', words: ['verre', 'bouteille', 'vin', 'bière', 'bocal', 'pot', 'flacon', 'parfum', 'confiture', 'vase'] },
+            brun: { name: 'Poubelle Brune', icon: '&#128462;', tips: 'Utilisez un sac compostable.', words: ['banane', 'pomme', 'fruit', 'légume', 'épluchure', 'pain', 'fromage', 'oeuf', 'viande', 'poisson', 'restes', 'café', 'aliment', 'nourriture', 'feuille', 'herbe'] },
+            gris: { name: 'Poubelle Grise', icon: '&#128462;', tips: 'Dernier recours.', words: ['stylo', 'crayon', 'mouchoir', 'lingette', 'cigarette', 'polystyrène', 'vaisselle', 'céramique', 'miroir', 'jouet'] },
+            orange: { name: 'Déchets Spéciaux', icon: '&#9888;', tips: 'Aller en déchetterie.', words: ['téléphone', 'ordinateur', 'tablette', 'écran', 'pile', 'batterie', 'chargeur', 'médicament', 'peinture', 'matelas', 'vêtements'] }
         };
         
-        const HF_SPACE_URL = "https://rafnotrat-projet-svt.hf.space";
+        function showResult(bin, resultArea) {
+            resultArea.innerHTML = '<div class="result-card ' + bin + '"><div class="icon">' + DB[bin].icon + '</div><div class="bin-name">' + DB[bin].name + '</div><div class="tips">' + DB[bin].tips + '</div></div>';
+        }
         
-        const BIN_MAP = {
-            'Jaune': 'yellow', 'Bleu': 'blue', 'Vert': 'green',
-            'Brun': 'brown', 'Gris': 'gray', 'Orange': 'orange'
-        };
+        function search() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const resultArea = document.getElementById('resultArea');
+            
+            if (!query) {
+                resultArea.innerHTML = '';
+                return;
+            }
+            
+            let found = false;
+            for (const [bin, data] of Object.entries(DB)) {
+                for (const word of data.words) {
+                    if (query.includes(word) || word.includes(query)) {
+                        showResult(bin, resultArea);
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+            
+            if (!found) {
+                resultArea.innerHTML = '<div class="result-card gray"><div class="icon">&#128462;</div><div class="bin-name">Poubelle Grise</div><div class="tips">Objet non reconnu. En cas de doute, mettez dans la poubelle grise.</div></div>';
+            }
+        }
         
-        function handleFile(file) {
+        document.getElementById('searchBtn').addEventListener('click', search);
+        document.getElementById('searchInput').addEventListener('keypress', e => { if (e.key === 'Enter') search(); });
+        
+        document.querySelectorAll('.example-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.getElementById('searchInput').value = item.dataset.item;
+                search();
+            });
+        });
+        
+        document.getElementById('fileInput').addEventListener('change', function() {
+            const file = this.files[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => {
-                selectedImage = e.target.result;
-                document.getElementById('uploadArea').innerHTML = `<img src="${selectedImage}" alt="Preview">`;
-                document.getElementById('previewArea').innerHTML = `
-                    <button class="btn btn-green" onclick="analyzeWithAI()">&#128640; Analyser</button>
-                    <button class="btn btn-red" onclick="resetPhoto()" style="margin-top:10px">Annuler</button>
-                `;
-                document.getElementById('resultArea').innerHTML = '';
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        function resetPhoto() {
-            selectedImage = null;
-            document.getElementById('uploadArea').innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
-            document.getElementById('previewArea').innerHTML = '';
-            document.getElementById('loadingArea').innerHTML = '';
-            document.getElementById('resultArea').innerHTML = '';
-        }
-        
-        async function analyzeWithAI() {
-            if (!selectedImage) return;
             
-            document.getElementById('previewArea').innerHTML = '';
-            document.getElementById('loadingArea').innerHTML = `
-                <div class="spinner"></div>
-                <p style="text-align:center;color:#888">Analyse en cours...</p>
-            `;
-            document.getElementById('resultArea').innerHTML = '';
+            const uploadArea = document.getElementById('uploadArea');
+            const photoResult = document.getElementById('photoResult');
             
-            try {
-                const base64Data = selectedImage.split(',')[1];
-                const byteString = atob(base64Data);
-                const ab = new ArrayBuffer(byteString.length);
-                const ia = new Uint8Array(ab);
-                for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-                const blob = new Blob([ab], { type: 'image/png' });
-                
-                const formData = new FormData();
-                formData.append('files', blob, 'photo.png');
-                
-                const uploadResp = await fetch(`${HF_SPACE_URL}/gradio_api/upload`, { method: 'POST', body: formData });
-                const uploadResult = await uploadResp.json();
-                const filePath = uploadResult[0];
-                
-                const callResponse = await fetch(`${HF_SPACE_URL}/gradio_api/call/predict`, {
+            uploadArea.innerHTML = '<div class="spinner"></div><p>Envoi vers IA...</p>';
+            
+            const formData = new FormData();
+            formData.append('files', file);
+            
+            fetch('https://rafnotrat-projet-svt.hf.space/gradio_api/upload', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                const filePath = data[0];
+                return fetch('https://rafnotrat-projet-svt.hf.space/gradio_api/call/predict', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ data: [{ path: filePath }] })
                 });
-                
-                const callData = await callResponse.json();
-                const eventId = callData.event_id;
-                
-                const resultResponse = await fetch(`${HF_SPACE_URL}/gradio_api/call/predict/${eventId}`);
-                const text = await resultResponse.text();
-                
-                document.getElementById('loadingArea').innerHTML = '';
-                
-                const dataLine = text.split('\n').find(l => l.startsWith('data: '));
-                if (!dataLine) { alert('Erreur'); return; }
-                
-                const raw = JSON.parse(dataLine.substring(6));
-                let result;
-                try { result = JSON.parse(raw[0]); } catch { result = { poubelle: raw[1] }; }
-                
-                const bin = BIN_MAP[result.poubelle] || 'gray';
-                const data = DB[bin];
-                
-                document.getElementById('resultArea').innerHTML = `
-                    <div class="result-card ${bin}">
-                        <span class="ai-badge">&#128640; Resultat IA</span>
-                        <div class="icon">${data.icon}</div>
-                        <div class="bin-name">${data.name}</div>
-                        <div class="tips">${result.conseil || data.tips}</div>
-                    </div>
-                `;
-                
-            } catch (e) {
-                document.getElementById('loadingArea').innerHTML = '';
-                alert('Erreur: ' + e.message);
-            }
-        }
-        
-        async function searchWithAI() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (!query) { alert('Ecrivez un objet'); return; }
-            
-            document.getElementById('loadingArea').innerHTML = `
-                <div class="spinner"></div>
-                <p style="text-align:center;color:#888">Recherche...</p>
-            `;
-            document.getElementById('resultArea').innerHTML = '';
-            
-            try {
-                const callResponse = await fetch(`${HF_SPACE_URL}/gradio_api/call/predict`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data: [query] })
-                });
-                
-                const callData = await callResponse.json();
-                const eventId = callData.event_id;
-                
-                const resultResponse = await fetch(`${HF_SPACE_URL}/gradio_api/call/predict/${eventId}`);
-                const text = await resultResponse.text();
-                
-                document.getElementById('loadingArea').innerHTML = '';
-                
-                const dataLine = text.split('\n').find(l => l.startsWith('data: '));
-                if (!dataLine) { alert('Erreur'); return; }
-                
-                const raw = JSON.parse(dataLine.substring(6));
-                let poubelle = raw[0] || raw[1] || '';
-                let bin = 'gray';
-                for (const [key, value] of Object.entries(BIN_MAP)) {
-                    if (poubelle.includes(key)) {
-                        bin = value;
-                        break;
+            })
+            .then(r => r.json())
+            .then(data => {
+                const eventId = data.event_id;
+                return fetch('https://rafnotrat-projet-svt.hf.space/gradio_api/call/predict/' + eventId);
+            })
+            .then(r => r.text())
+            .then(text => {
+                const lines = text.split('\n');
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const raw = JSON.parse(line.substring(6));
+                        let poubelle = raw[1] || raw[0] || '';
+                        
+                        let bin = 'gris';
+                        if (poubelle.includes('Jaune')) bin = 'jaune';
+                        else if (poubelle.includes('Bleu')) bin = 'bleu';
+                        else if (poubelle.includes('Vert')) bin = 'vert';
+                        else if (poubelle.includes('Brun')) bin = 'brun';
+                        else if (poubelle.includes('Orange')) bin = 'orange';
+                        else if (poubelle.includes('Gris')) bin = 'gris';
+                        
+                        photoResult.innerHTML = '<div class="result-card ' + bin + '"><div class="icon">' + DB[bin].icon + '</div><div class="bin-name">' + DB[bin].name + '</div><div class="tips">' + DB[bin].tips + '</div></div>';
+                        uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
+                        return;
                     }
                 }
-                
-                const data = DB[bin];
-                
-                document.getElementById('resultArea').innerHTML = `
-                    <div class="result-card ${bin}">
-                        <span class="ai-badge">&#128640; Resultat IA</span>
-                        <div class="icon">${data.icon}</div>
-                        <div class="bin-name">${data.name}</div>
-                        <div class="tips">${data.tips}</div>
-                    </div>
-                `;
-                
-            } catch (e) {
-                document.getElementById('loadingArea').innerHTML = '';
-                alert('Erreur: ' + e.message);
-            }
-        }
-        
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') searchWithAI();
+                uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
+                photoResult.innerHTML = '<p style="color:red">Erreur</p>';
+            })
+            .catch(err => {
+                uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
+                photoResult.innerHTML = '<p style="color:red">Erreur: ' + err.message + '</p>';
+            });
         });
     </script>
 </body>
