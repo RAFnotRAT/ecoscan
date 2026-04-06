@@ -4,151 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4caf50">
     <title>EcoScan - Tri Selectif</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            color: #1b5e20;
-            min-height: 100vh;
-            padding-bottom: 30px;
-        }
-        
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .header h1 { font-size: 32px; color: #2e7d32; margin-bottom: 10px; }
-        .header p { font-size: 14px; color: #666; line-height: 1.5; }
-        
-        .search-box {
-            background: white;
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-        }
-        .search-box h3 { font-size: 14px; color: #888; margin-bottom: 10px; }
-        .search-input {
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            outline: none;
-            margin-bottom: 10px;
-        }
-        .search-input:focus { border-color: #4caf50; }
-        
-        .btn {
-            padding: 15px 25px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-        }
-        .btn-green { background: #4caf50; color: white; }
-        .btn-red { background: #ef5350; color: white; }
-        
-        .photo-box {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .photo-box h3 { font-size: 14px; color: #888; margin-bottom: 15px; }
-        .upload-area {
-            border: 3px dashed #4caf50;
-            border-radius: 15px;
-            padding: 40px 20px;
-            cursor: pointer;
-            margin-bottom: 15px;
-        }
-        .upload-area .icon { font-size: 50px; }
-        .upload-area p { color: #888; margin-top: 10px; }
-        .upload-area img { max-width: 100%; max-height: 200px; border-radius: 10px; }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e0e0e0;
-            border-top-color: #4caf50;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .result-card {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            margin-top: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        }
-        .result-card .icon { font-size: 60px; margin-bottom: 10px; }
-        .result-card .bin-name { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
-        .result-card .tips { font-size: 13px; color: #888; font-style: italic; }
-        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, sans-serif; background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #1b5e20; min-height: 100vh; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        h1 { font-size: 32px; color: #2e7d32; text-align: center; margin-bottom: 10px; }
+        .desc { text-align: center; color: #666; margin-bottom: 25px; font-size: 14px; }
+        .box { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
+        .box h3 { font-size: 14px; color: #888; margin-bottom: 10px; }
+        input { width: 100%; padding: 15px; font-size: 16px; border: 2px solid #e0e0e0; border-radius: 12px; margin-bottom: 10px; }
+        button { width: 100%; padding: 15px; font-size: 16px; border: none; border-radius: 12px; background: #4caf50; color: white; font-weight: 600; cursor: pointer; }
+        .upload { border: 3px dashed #4caf50; border-radius: 15px; padding: 40px; text-align: center; cursor: pointer; }
+        .upload .icon { font-size: 50px; }
+        .upload p { color: #888; margin-top: 10px; }
+        .upload img { max-width: 100%; border-radius: 10px; }
+        .result { background: white; border-radius: 20px; padding: 25px; text-align: center; margin-top: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: relative; }
+        .result .close-btn { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: none; border-radius: 50%; background: #f5f5f5; color: #888; font-size: 18px; cursor: pointer; }
+        .result .icon { font-size: 60px; }
+        .result .name { font-size: 22px; font-weight: bold; margin: 10px 0; }
+        .result .tips { font-size: 13px; color: #888; font-style: italic; }
         .yellow { background: linear-gradient(135deg, #fff9c4, #fff176); border: 3px solid #fbc02d; }
         .blue { background: linear-gradient(135deg, #bbdefb, #90caf9); border: 3px solid #1976d2; }
         .green { background: linear-gradient(135deg, #c8e6c9, #a5d6a7); border: 3px solid #4caf50; }
-        .brown { background: linear-gradient(135deg, #d7ccc8, #bcaaa4); border: 3px solid #795548; }
+        .brown { background: linear-gradient(135deg, #d7ccc8, #bcaaa4); border: 3px solid #795548; color: white; }
         .gray { background: linear-gradient(135deg, #eceff1, #cfd8dc); border: 3px solid #607d8b; }
         .orange { background: linear-gradient(135deg, #ffe0b2, #ffcc80); border: 3px solid #f57c00; }
-        
-        .examples {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-        }
-        .examples h3 { font-size: 16px; color: #2e7d32; margin-bottom: 15px; }
-        .examples-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .example-item {
-            background: #f5f5f5;
-            border-radius: 10px;
-            padding: 15px 5px;
-            text-align: center;
-            cursor: pointer;
-        }
-        .example-item .emoji { font-size: 30px; }
-        .example-item .name { font-size: 11px; margin-top: 5px; color: #666; }
-        
+        .examples { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .example { background: #f5f5f5; border-radius: 10px; padding: 15px 5px; text-align: center; cursor: pointer; }
+        .example .emoji { font-size: 30px; }
+        .example .name { font-size: 11px; color: #666; margin-top: 5px; }
         .footer { text-align: center; padding: 20px; color: #888; font-size: 12px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #e0e0e0; border-top-color: #4caf50; border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>EcoScan</h1>
-            <p>Envoie une photo d'un objet ou cherche son nom,<br>l'IA te dira dans quelle poubelle le trier !</p>
-        </div>
+        <h1>EcoScan</h1>
+        <p class="desc">Envoie une photo ou cherche le nom d'un objet<br>pour savoir dans quelle poubelle le trier !</p>
         
-        <div class="search-box">
+        <div class="box">
             <h3>Recherche par texte</h3>
-            <input type="text" class="search-input" id="searchInput" placeholder="Ex: bouteille, journal, stylo...">
-            <button class="btn btn-green" id="searchBtn">Rechercher</button>
+            <input type="text" id="searchInput" placeholder="Ex: stylo, bouteille, journal...">
+            <button id="searchBtn">Rechercher</button>
             <div id="resultArea"></div>
         </div>
         
-        <div class="photo-box">
+        <div class="box">
             <h3>Ou envoie une photo</h3>
-            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+            <div class="upload" id="uploadArea" onclick="document.getElementById('fileInput').click()">
                 <div class="icon">&#128247;</div>
                 <p>Cliquez pour choisir une photo</p>
             </div>
@@ -156,15 +62,15 @@
             <div id="photoResult"></div>
         </div>
         
-        <div class="examples">
+        <div class="box">
             <h3>Exemples</h3>
-            <div class="examples-grid">
-                <div class="example-item" data-item="bouteille"><div class="emoji">&#128154;</div><div class="name">Bouteille</div></div>
-                <div class="example-item" data-item="journal"><div class="emoji">&#128240;</div><div class="name">Journal</div></div>
-                <div class="example-item" data-item="stylo"><div class="emoji">&#128394;</div><div class="name">Stylo</div></div>
-                <div class="example-item" data-item="banane"><div class="emoji">&#127822;</div><div class="name">Banane</div></div>
-                <div class="example-item" data-item="téléphone"><div class="emoji">&#128241;</div><div class="name">Téléphone</div></div>
-                <div class="example-item" data-item="verre"><div class="emoji">&#128154;</div><div class="name">Verre</div></div>
+            <div class="examples">
+                <div class="example" data-item="bouteille"><div class="emoji">&#128154;</div><div class="name">Bouteille</div></div>
+                <div class="example" data-item="journal"><div class="emoji">&#128240;</div><div class="name">Journal</div></div>
+                <div class="example" data-item="stylo"><div class="emoji">&#128394;</div><div class="name">Stylo</div></div>
+                <div class="example" data-item="banane"><div class="emoji">&#127822;</div><div class="name">Banane</div></div>
+                <div class="example" data-item="telephone"><div class="emoji">&#128241;</div><div class="name">Telephone</div></div>
+                <div class="example" data-item="verre"><div class="emoji">&#128154;</div><div class="name">Verre</div></div>
             </div>
         </div>
         
@@ -172,52 +78,66 @@
     </div>
     
     <script>
-        const DB = {
-            jaune: { name: 'Poubelle Jaune', icon: '&#128462;', tips: 'Videz et aplatissez. Retirez les films.', words: ['bouteille', 'plastique', 'canette', 'conserve', 'sac', 'emballage', 'carton', 'métal', 'aluminium', 'film', 'gobelet', 'pot', 'barquette', 'brique', 'couvercle', 'dosette'] },
-            bleu: { name: 'Poubelle Bleue', icon: '&#128462;', tips: 'Ne pas froisser. Pas de papier sale.', words: ['journal', 'magazine', 'papier', 'livre', 'cahier', 'enveloppe', 'prospectus', 'catalogue', 'revue'] },
-            vert: { name: 'Poubelle Verte', icon: '&#128462;', tips: 'Retirez les bouchons.', words: ['verre', 'bouteille', 'vin', 'bière', 'bocal', 'pot', 'flacon', 'parfum', 'confiture', 'vase'] },
-            brun: { name: 'Poubelle Brune', icon: '&#128462;', tips: 'Utilisez un sac compostable.', words: ['banane', 'pomme', 'fruit', 'légume', 'épluchure', 'pain', 'fromage', 'oeuf', 'viande', 'poisson', 'restes', 'café', 'aliment', 'nourriture', 'feuille', 'herbe'] },
-            gris: { name: 'Poubelle Grise', icon: '&#128462;', tips: 'Dernier recours.', words: ['stylo', 'crayon', 'mouchoir', 'lingette', 'cigarette', 'polystyrène', 'vaisselle', 'céramique', 'miroir', 'jouet'] },
-            orange: { name: 'Déchets Spéciaux', icon: '&#9888;', tips: 'Aller en déchetterie.', words: ['téléphone', 'ordinateur', 'tablette', 'écran', 'pile', 'batterie', 'chargeur', 'médicament', 'peinture', 'matelas', 'vêtements'] }
+        const BINS = {
+            jaune: { name: 'Poubelle Jaune', icon: '&#128462;', tips: 'Videz et aplatissez. Retirez les films.' },
+            bleu: { name: 'Poubelle Bleue', icon: '&#128462;', tips: 'Ne pas froisser. Pas de papier sale.' },
+            vert: { name: 'Poubelle Verte', icon: '&#128462;', tips: 'Retirez les bouchons.' },
+            brun: { name: 'Poubelle Brune', icon: '&#128462;', tips: 'Utilisez un sac compostable.' },
+            gris: { name: 'Poubelle Grise', icon: '&#128462;', tips: 'Dernier recours.' },
+            orange: { name: 'Dechets Speciaux', icon: '&#9888;', tips: 'Aller en dechetterie.' }
         };
         
-        function showResult(bin, resultArea) {
-            resultArea.innerHTML = '<div class="result-card ' + bin + '"><div class="icon">' + DB[bin].icon + '</div><div class="bin-name">' + DB[bin].name + '</div><div class="tips">' + DB[bin].tips + '</div></div>';
+        const WORDS = {
+            jaune: ['bouteille', 'plastique', 'canette', 'conserve', 'sac', 'emballage', 'carton', 'metal', 'aluminium', 'film', 'gobelet', 'pot', 'barquette', 'brique', 'couvercle', 'dosette', 'shampoing', 'gel', 'lessive', 'detergent', 'nettoyant', 'flacon', 'bidon', 'boite', 'tube', 'sachet', 'paquet', 'aerosol', 'spray', 'desodorisant', 'liquide', 'produit', 'bouchon', 'plastique'],
+            bleu: ['journal', 'magazine', 'papier', 'livre', 'cahier', 'enveloppe', 'prospectus', 'catalogue', 'revue', 'quotidien', 'presse', 'imprime', 'feuille', 'document', 'courrier', 'lettre', 'carte', 'poster', 'brochure', 'depliant', 'flyer', 'journal'],
+            vert: ['verre', 'bouteille', 'vin', 'biere', 'bocal', 'pot', 'flacon', 'parfum', 'confiture', 'miel', 'sirop', 'vase', 'carafe', 'glace'],
+            brun: ['banane', 'pomme', 'orange', 'fruit', 'legume', 'epluchure', 'pelure', 'pain', 'fromage', 'oeuf', 'coquille', 'viande', 'poisson', 'volaille', 'restes', 'repas', 'cafe', 'the', 'aliment', 'nourriture', 'feuille', 'herbe', 'plante', 'fleur', 'tige', 'branche', 'ecorce', 'compost', 'organique', 'biodgradable'],
+            gris: ['stylo', 'crayon', 'mouchoir', 'lingette', 'cigarette', 'megot', 'cendres', 'polystyrene', 'styrofoam', 'vaisselle', 'ceramique', 'miroir', 'jouet', 'cassette', 'cassete', 'casse', 'briquet', 'megot', 'gomme', 'masque', 'gant', 'chiffon', 'eponge', 'balai', 'poussiere', 'cheveux', 'ongle', 'cendre', 'Protection'],
+            orange: ['telephone', 'portable', 'smartphone', 'gsm', 'ordi', 'ordinateur', 'laptop', 'tablette', 'ipad', 'ecran', 'moniteur', 'clavier', 'souris', 'imprimante', 'chargeur', 'cable', 'usb', 'cle', 'disque', 'batterie', 'pile', 'haut-parleur', 'casque', 'ecouteur', 'radio', 'television', 'tv', 'dvd', 'console', 'manette', 'fer', 'lave-linge', 'frigo', 'refrigerateur', 'micro-ondes', 'four', 'aspirateur', 'lampe', 'ampoule', 'medicament', 'pilule', 'peinture', 'solvant', 'colle', 'pneu', 'matelas', 'canape', 'meuble', 'bois', 'tapis', 'textile', 'vetement', 'pantalon', 'chemise', 'pull', 'veste', 'manteau', 'chaussure', 'chaussette', 'casquette', 'chapeau', 'echarpe', 'rideau', 'couverture', 'drap', 'oreiller', 'couette', 'lingette hygiene']
+        };
+        
+        function showResult(bin, containerId) {
+            const binData = BINS[bin];
+            document.getElementById(containerId).innerHTML = 
+                '<div class="result ' + bin + '">' +
+                '<button class="close-btn" onclick="this.parentElement.remove()">&#10006;</button>' +
+                '<div class="icon">' + binData.icon + '</div>' +
+                '<div class="name">' + binData.name + '</div>' +
+                '<div class="tips">' + binData.tips + '</div>' +
+                '</div>';
         }
         
-        function search() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            const resultArea = document.getElementById('resultArea');
+        function search(text) {
+            text = text.toLowerCase().trim();
+            if (!text) return;
             
-            if (!query) {
-                resultArea.innerHTML = '';
-                return;
-            }
+            let foundBin = 'gris';
             
-            let found = false;
-            for (const [bin, data] of Object.entries(DB)) {
-                for (const word of data.words) {
-                    if (query.includes(word) || word.includes(query)) {
-                        showResult(bin, resultArea);
-                        found = true;
+            for (const [bin, words] of Object.entries(WORDS)) {
+                for (const word of words) {
+                    if (text.includes(word) || word.includes(text)) {
+                        foundBin = bin;
                         break;
                     }
                 }
-                if (found) break;
+                if (foundBin !== 'gris') break;
             }
             
-            if (!found) {
-                resultArea.innerHTML = '<div class="result-card gray"><div class="icon">&#128462;</div><div class="bin-name">Poubelle Grise</div><div class="tips">Objet non reconnu. En cas de doute, mettez dans la poubelle grise.</div></div>';
-            }
+            showResult(foundBin, 'resultArea');
         }
         
-        document.getElementById('searchBtn').addEventListener('click', search);
-        document.getElementById('searchInput').addEventListener('keypress', e => { if (e.key === 'Enter') search(); });
+        document.getElementById('searchBtn').addEventListener('click', function() {
+            search(document.getElementById('searchInput').value);
+        });
         
-        document.querySelectorAll('.example-item').forEach(item => {
-            item.addEventListener('click', () => {
-                document.getElementById('searchInput').value = item.dataset.item;
-                search();
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') search(this.value);
+        });
+        
+        document.querySelectorAll('.example').forEach(function(el) {
+            el.addEventListener('click', function() {
+                document.getElementById('searchInput').value = this.dataset.item;
+                search(this.dataset.item);
             });
         });
         
@@ -233,48 +153,52 @@
             const formData = new FormData();
             formData.append('files', file);
             
-            fetch('https://rafnotrat-projet-svt.hf.space/gradio_api/upload', { method: 'POST', body: formData })
-            .then(r => r.json())
-            .then(data => {
-                const filePath = data[0];
+            fetch('https://rafnotrat-projet-svt.hf.space/gradio_api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data || !data[0]) throw new Error('Upload failed');
+                
                 return fetch('https://rafnotrat-projet-svt.hf.space/gradio_api/call/predict', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data: [{ path: filePath }] })
+                    body: JSON.stringify({ data: [{ path: data[0] }] })
                 });
             })
-            .then(r => r.json())
-            .then(data => {
-                const eventId = data.event_id;
-                return fetch('https://rafnotrat-projet-svt.hf.space/gradio_api/call/predict/' + eventId);
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data || !data.event_id) throw new Error('Call failed');
+                return fetch('https://rafnotrat-projet-svt.hf.space/gradio_api/call/predict/' + data.event_id);
             })
-            .then(r => r.text())
-            .then(text => {
+            .then(function(r) { return r.text(); })
+            .then(function(text) {
                 const lines = text.split('\n');
                 for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const raw = JSON.parse(line.substring(6));
-                        let poubelle = raw[1] || raw[0] || '';
+                    if (line.indexOf('data:') !== -1) {
+                        const raw = JSON.parse(line.replace('data:', ''));
+                        const result = raw[0] || raw;
                         
                         let bin = 'gris';
-                        if (poubelle.includes('Jaune')) bin = 'jaune';
-                        else if (poubelle.includes('Bleu')) bin = 'bleu';
-                        else if (poubelle.includes('Vert')) bin = 'vert';
-                        else if (poubelle.includes('Brun')) bin = 'brun';
-                        else if (poubelle.includes('Orange')) bin = 'orange';
-                        else if (poubelle.includes('Gris')) bin = 'gris';
+                        if (result.indexOf('Jaune') !== -1) bin = 'jaune';
+                        else if (result.indexOf('Bleu') !== -1) bin = 'bleu';
+                        else if (result.indexOf('Vert') !== -1) bin = 'vert';
+                        else if (result.indexOf('Brun') !== -1) bin = 'brun';
+                        else if (result.indexOf('Orange') !== -1) bin = 'orange';
+                        else if (result.indexOf('Gris') !== -1) bin = 'gris';
                         
-                        photoResult.innerHTML = '<div class="result-card ' + bin + '"><div class="icon">' + DB[bin].icon + '</div><div class="bin-name">' + DB[bin].name + '</div><div class="tips">' + DB[bin].tips + '</div></div>';
                         uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
+                        showResult(bin, 'photoResult');
                         return;
                     }
                 }
                 uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
                 photoResult.innerHTML = '<p style="color:red">Erreur</p>';
             })
-            .catch(err => {
+            .catch(function(err) {
                 uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
-                photoResult.innerHTML = '<p style="color:red">Erreur: ' + err.message + '</p>';
+                photoResult.innerHTML = '<p style="color:red">Erreur</p>';
             });
         });
     </script>
