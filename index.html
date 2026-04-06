@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2e7d32">
+    <title>EcoScan - Tri Selectif</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; overflow: hidden; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: #1b5e20;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+        }
+        .header h1 { font-size: 24px; }
+        .header p { font-size: 12px; opacity: 0.9; }
+        
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            padding-bottom: 70px;
+        }
+        
+        .nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 10px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #888;
+            font-size: 10px;
+        }
+        .nav-item.active { color: #4caf50; }
+        .nav-item .icon { font-size: 22px; }
+        
+        .screen { display: none; }
+        .screen.active { display: block; }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+        }
+        .search-input:focus { border-color: #4caf50; }
+        
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        .filter-chip {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            white-space: nowrap;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .objects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .object-btn {
+            background: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 5px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        .object-btn:active { transform: scale(0.95); }
+        .object-btn .emoji { font-size: 28px; }
+        .object-btn .name { font-size: 10px; margin-top: 5px; }
+        
+        .upload-box {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            border: 3px dashed #4caf50;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .upload-box img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #4caf50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 15px;
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: #f5f5f5;
+            cursor: pointer;
+        }
+        .result-card .icon { font-size: 50px; }
+        .result-card .title { font-size: 14px; color: #666; margin: 10px 0 5px; }
+        .result-card .subtitle { font-size: 18px; font-weight: bold; }
+        .result-card .bin-name { font-size: 20px; font-weight: bold; margin: 10px 0 5px; }
+        .result-card .tips { font-size: 12px; color: #666; margin-top: 10px; }
+        
+        .yellow { background: linear-gradient(135deg, #fff59d, #ffee58); border: 3px solid #fbc02d; color: #333; }
+        .blue { background: linear-gradient(135deg, #90caf9, #64b5f6); color: white; border: 3px solid #1976d2; }
+        .green { background: linear-gradient(135deg, #a5d6a7, #81c784); color: #1b5e20; border: 3px solid #4caf50; }
+        .brown { background: linear-gradient(135deg, #bcaaa4, #a1887f); color: white; border: 3px solid #795548; }
+        .gray { background: linear-gradient(135deg, #bdbdbd, #9e9e9e); color: white; border: 3px solid #616161; }
+        .orange { background: linear-gradient(135deg, #ffcc80, #ffb74d); color: #333; border: 3px solid #f57c00; }
+        
+        .bin-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+        .bin-card .icon { font-size: 35px; }
+        .bin-card .name { font-weight: bold; font-size: 14px; }
+        .bin-card .desc { font-size: 12px; opacity: 0.8; }
+        
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .history-item .icon { font-size: 28px; }
+        .history-item .info { flex: 1; cursor: pointer; }
+        .history-item .name { font-weight: 600; font-size: 13px; }
+        .history-item .bin { font-size: 11px; color: #888; }
+        .delete-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 50%;
+            background: #ffebee;
+            color: #ef5350;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .delete-btn:active { transform: scale(0.9); }
+        
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .stat-box {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-box .value { font-size: 24px; font-weight: bold; }
+        .stat-box .label { font-size: 10px; opacity: 0.9; }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin: 5px 0;
+        }
+        .btn-green { background: #4caf50; color: white; }
+        .btn-red { background: #ef5350; color: white; }
+        
+        .ai-badge {
+            background: #9c27b0;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            display: inline-block;
+        }
+        
+        .info-banner {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .info-banner h3 { color: #1565c0; font-size: 14px; }
+        .info-banner p { font-size: 12px; margin-top: 5px; }
+        
+        .settings-section {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+        
+        .toggle {
+            width: 50px;
+            height: 28px;
+            border-radius: 14px;
+            background: #ddd;
+            position: relative;
+            cursor: pointer;
+        }
+        .toggle.on { background: #4caf50; }
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+        }
+        .toggle.on::after { left: 24px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>EcoScan</h1>
+        <p>Apprends a trier tes dechets</p>
+    </div>
+    
+    <div class="content">
+        <div id="screen-search" class="screen active">
+            <div class="card">
+                <input type="text" class="search-input" id="searchInput" placeholder="Rechercher un objet...">
+            </div>
+            <div class="filter-row" id="filterRow"></div>
+            <div class="objects-grid" id="objectsGrid"></div>
+            <div id="resultArea"></div>
+        </div>
+        
+        <div id="screen-photo" class="screen">
+            <div class="info-banner">
+                <h3>Photo avec IA</h3>
+                <p>Envoie une photo d'un objet, et l'IA te dira dans quelle poubelle le mettre !</p>
+            </div>
+            <div class="upload-box" id="uploadBox" onclick="document.getElementById('fileInput').click()">
+                <p style="font-size:40px">&#128247;</p>
+                <p>Cliquez pour choisir une photo</p>
+            </div>
+            <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(this.files[0])">
+            <div id="previewArea"></div>
+            <div id="loadingArea"></div>
+            <div id="aiResultArea"></div>
+        </div>
+        
+        <div id="screen-bins" class="screen">
+            <div class="info-banner">
+                <h3>Les 6 poubelles</h3>
+                <p>Clique sur une poubelle pour voir les objets</p>
+            </div>
+            <div id="binsList"></div>
+        </div>
+        
+        <div id="screen-history" class="screen">
+            <div class="card" style="margin-bottom:10px">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <h3 style="font-size:12px;color:#888">Historique</h3>
+                    <button class="btn btn-red" style="width:auto;padding:5px 10px;font-size:11px" onclick="clearHistory()">Tout effacer</button>
+                </div>
+            </div>
+            <div id="historyList"></div>
+        </div>
+        
+        <div id="screen-text" class="screen">
+            <div class="info-banner">
+                <h3>Recherche par texte</h3>
+                <p>Tape le nom d'un objet et l'IA te dira dans quelle poubelle le trier !</p>
+            </div>
+            <div class="card">
+                <input type="text" class="search-input" id="textSearchInput" placeholder="Ex: bouteille plastique, journal, peau de banane..." style="margin-bottom:10px">
+                <div style="display:flex;gap:10px">
+                    <button class="btn btn-green" onclick="searchWithAI()">&#128640; Rechercher</button>
+                    <button class="btn btn-red" onclick="clearTextSearch()">Effacer</button>
+                </div>
+            </div>
+            <div id="textLoadingArea"></div>
+            <div id="textResultArea"></div>
+        </div>
+        
+        <div id="screen-settings" class="screen">
+            <div class="card" style="background:linear-gradient(135deg,#4caf50,#2e7d32);color:white;text-align:center">
+                <div style="font-size:50px">&#127793;</div>
+                <h2 style="font-size:20px">EcoScan</h2>
+                <p style="opacity:0.9">Version avec IA EcoScan (Hugging Face)</p>
+            </div>
+            
+            <div class="stat-grid" id="statsGrid"></div>
+            
+            <div class="settings-section">
+                <div class="settings-row">
+                    <span>Mode sombre</span>
+                    <div class="toggle" id="toggleDark" onclick="toggleDark()"></div>
+                </div>
+                <div class="settings-row">
+                    <span>Vibration</span>
+                    <div class="toggle" id="toggleVibration" onclick="toggleVibration()"></div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <button class="btn btn-green" onclick="exportData()">Exporter donnees</button>
+                <button class="btn btn-red" onclick="if(confirm('Effacer tout?')){localStorage.clear();location.reload()}">Reinitialiser</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="nav">
+        <button class="nav-item active" onclick="showScreen('search')">
+            <span class="icon">&#128269;</span>
+            <span>Recherche</span>
+        </button>
+        <button class="nav-item" onclick="showScreen('photo')">
+            <span class="icon">&#128247;</span>
+            <span>Photo IA</span>
+        </button>
+        <button class="nav-item" onclick="showScreen('bins')">
+            <span class="icon">&#128465;</span>
+            <span>Poubelles</span>
+        </button>
+        <button class="nav-item" onclick="showScreen('history')">
+            <span class="icon">&#128203;</span>
+            <span>Historique</span>
+        </button>
+        <button class="nav-item" onclick="showScreen('settings')">
+            <span class="icon">&#9881;</span>
+            <span>Params</span>
+        </button>
+    </div>
+    
+    <script>
+        const DB = {
+            yellow: { name: 'Poubelle Jaune', icon: '&#128462;', color: 'yellow', desc: 'Plastique, metal, cartons',
+                items: [
+                    {n:'Bouteille plastique',e:'&#128154;'},{n:'Bouteille eau',e:'&#128167;'},{n:'Bouteille soda',e:'&#127866;'},
+                    {n:'Gobelet plastique',e:'&#127837;'},{n:'Sac plastique',e:'&#128722;'},{n:'Canette',e:'&#127869;'},
+                    {n:'Conserve',e:'&#129385;'},{n:'Film plastique',e:'&#129470;'},{n:'Barquette',e:'&#129388;'},
+                    {n:'Polystyrene',e:'&#128218;'},{n:'Carton',e:'&#128230;'},{n:'Emballage',e:'&#128230;'},
+                    {n:'Dosette cafe',e:'&#9749;'},{n:'Bouchon',e:'&#127942;'},{n:'Brique lait',e:'&#127846;'}
+                ],
+                tips: ['Rincez', 'Ecrasez', 'Bouchons']
+            },
+            blue: { name: 'Poubelle Bleue', icon: '&#128462;', color: 'blue', desc: 'Papier, journaux',
+                items: [
+                    {n:'Journal',e:'&#128240;'},{n:'Magazine',e:'&#128214;'},{n:'Prospectus',e:'&#128196;'},
+                    {n:'Papier',e:'&#128196;'},{n:'Enveloppe',e:'&#128233;'},{n:'Cahier',e:'&#128210;'},
+                    {n:'Livre',e:'&#128218;'},{n:'Catalogue',e:'&#128214;'},{n:'Carton',e:'&#128230;'}
+                ],
+                tips: ['Pliez', 'Pas de papier sale']
+            },
+            green: { name: 'Poubelle Verte', icon: '&#128462;', color: 'green', desc: 'Verre uniquement',
+                items: [
+                    {n:'Bouteille vin',e:'&#127810;'},{n:'Bouteille biere',e:'&#127866;'},{n:'Bocal',e:'&#129389;'},
+                    {n:'Bocal confiture',e:'&#127858;'},{n:'Pot yaourts',e:'&#129388;'},{n:'Flacon parfum',e:'&#129719;'},
+                    {n:'Vase',e:'&#127807;'},{n:'Verre',e:'&#128154;'}
+                ],
+                tips: ['Rincez', 'Retirez bouchons']
+            },
+            brown: { name: 'Poubelle Brune', icon: '&#128462;', color: 'brown', desc: 'Aliments, organiques',
+                items: [
+                    {n:'Pomme',e:'&#127822;'},{n:'Banane',e:'&#127820;'},{n:'Orange',e:'&#127818;'},{n:'Citron',e:'&#127819;'},
+                    {n:'Raisin',e:'&#127815;'},{n:'Fraise',e:'&#127827;'},{n:'Tomate',e:'&#127813;'},{n:'Carotte',e:'&#129704;'},
+                    {n:'Pain',e:'&#127838;'},{n:'Fromage',e:'&#129472;'},{n:'Oeuf',e:'&#129370;'},{n:'Viande',e:'&#129385;'},
+                    {n:'Poisson',e:'&#128031;'},{n:'Poulet',e:'&#128018;'},{n:'Cafe',e:'&#9749;'},{n:'Feuille',e:'&#127807;'},
+                    {n:'Fruit',e:'&#127822;'},{n:'Legume',e:'&#129388;'},{n:'Yaourt',e:'&#129388;'}
+                ],
+                tips: ['Fermez le sac', 'Pas de sac plastique']
+            },
+            gray: { name: 'Poubelle Grise', icon: '&#128462;', color: 'gray', desc: 'Non recyclables',
+                items: [
+                    {n:'Mouchoir',e:'&#129296;'},{n:'Papier-toilette',e:'&#128701;'},{n:'Couche',e:'&#128694;'},
+                    {n:'Lingette',e:'&#129296;'},{n:'Cigarette',e:'&#128684;'},{n:'Stylo',e:'&#128394;'},
+                    {n:'Bougie',e:'&#129519;'},{n:'Ceramique',e:'&#127789;'}
+                ],
+                tips: ['Non valorisable']
+            },
+            orange: { name: 'Dechets Speciaux', icon: '&#9888;', color: 'orange', desc: 'Dechetterie',
+                items: [
+                    {n:'Pile',e:'&#128267;'},{n:'Batterie',e:'&#128267;'},{n:'Ampoule',e:'&#128161;'},
+                    {n:'Medicament',e:'&#129658;'},{n:'Peinture',e:'&#127912;'},{n:'Frigo',e:'&#128253;'},
+                    {n:'Ordinateur',e:'&#128187;'},{n:'Telephone',e:'&#128241;'},{n:'Matelas',e:'&#128716;'}
+                ],
+                tips: ['Aller en dechetterie', 'Jamais dans les ordures']
+            }
+        };
+        
+        let SETTINGS = { darkMode: false, vibration: false };
+        let HISTORY = [];
+        let STATS = { total: 0, aiTotal: 0, recyclable: 0 };
+        let currentFilter = 'all';
+        let selectedImage = null;
+        
+        function init() {
+            loadData();
+            renderFilters();
+            renderObjects();
+            renderBins();
+            renderStats();
+            updateToggles();
+            setupDragDrop();
+            
+            document.getElementById('searchInput').addEventListener('input', function() {
+                const q = this.value.toLowerCase().trim();
+                renderObjects(q.length > 0 ? q : null);
+            });
+            
+            document.getElementById('textSearchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchWithAI();
+            });
+        }
+        
+        function loadData() {
+            const s = localStorage.getItem('ecoscan_settings');
+            if (s) SETTINGS = JSON.parse(s);
+            const h = localStorage.getItem('ecoscan_history');
+            if (h) HISTORY = JSON.parse(h);
+            const st = localStorage.getItem('ecoscan_stats');
+            if (st) STATS = JSON.parse(st);
+        }
+        
+        function saveData() {
+            localStorage.setItem('ecoscan_settings', JSON.stringify(SETTINGS));
+            localStorage.setItem('ecoscan_history', JSON.stringify(HISTORY));
+            localStorage.setItem('ecoscan_stats', JSON.stringify(STATS));
+        }
+        
+        function setupDragDrop() {
+            const box = document.getElementById('uploadBox');
+            box.addEventListener('dragover', e => { e.preventDefault(); });
+            box.addEventListener('drop', e => {
+                e.preventDefault();
+                if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+            });
+        }
+        
+        function handleFile(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                selectedImage = e.target.result;
+                document.getElementById('uploadBox').innerHTML = `<img src="${selectedImage}" alt="Preview">`;
+                document.getElementById('previewArea').innerHTML = `
+                    <button class="btn btn-green" onclick="analyzeWithAI()">&#128640; Analyser avec IA EcoScan</button>
+                    <button class="btn btn-red" onclick="resetPhoto()">Annuler</button>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function resetPhoto() {
+            selectedImage = null;
+            document.getElementById('uploadBox').innerHTML = '<p style="font-size:40px">&#128247;</p><p>Cliquez pour choisir une photo</p>';
+            document.getElementById('previewArea').innerHTML = '';
+            document.getElementById('loadingArea').innerHTML = '';
+            document.getElementById('aiResultArea').innerHTML = '';
+        }
+        
+        // ── URL de ton Hugging Face Space ───────────────────────────────────────────
+        // Remplace cette valeur après avoir créé ton Space sur huggingface.co/spaces
+        // Format : https://TON-USERNAME-ecoscan.hf.space
+        const HF_SPACE_URL = "https://rafnotrat-projet-svt.hf.space";
+
+        // Correspondance poubelle française → clé DB
+        const BIN_MAP = {
+            'Jaune':  'yellow',
+            'Bleu':   'blue',
+            'Vert':   'green',
+            'Brun':   'brown',
+            'Gris':   'gray',
+            'Orange': 'orange'
+        };
+
+        async function analyzeWithAI() {
+            if (!selectedImage) return;
+
+            document.getElementById('previewArea').innerHTML = '';
+            document.getElementById('loadingArea').innerHTML = `
+                <div class="card" style="text-align:center">
+                    <div class="spinner"></div>
+                    <p>Analyse par IA EcoScan...</p>
+                    <span class="ai-badge">&#128640; IA EcoScan</span>
+                    <button class="btn btn-red" style="margin-top:10px" onclick="resetPhoto()">Annuler</button>
+                </div>
+            `;
+
+            try {
+                // Etape 1 : convertir base64 en fichier et uploader
+                const base64Data = selectedImage.split(',')[1];
+                const byteString = atob(base64Data);
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+                const blob = new Blob([ab], { type: 'image/png' });
+
+                const formData = new FormData();
+                formData.append('files', blob, 'photo.png');
+
+                const uploadResp = await fetch(`${HF_SPACE_URL}/gradio_api/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const uploadResult = await uploadResp.json();
+                const filePath = uploadResult[0];
+
+                // Etape 2 : appeler predict avec le fichier uploade
+                const callResponse = await fetch(`${HF_SPACE_URL}/gradio_api/call/predict`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: [{ path: filePath }] })
+                });
+
+                const callData = await callResponse.json();
+                const eventId = callData.event_id;
+
+                // Etape 3 : recuperer le resultat via SSE
+                const resultResponse = await fetch(`${HF_SPACE_URL}/gradio_api/call/predict/${eventId}`);
+                const text = await resultResponse.text();
+
+                document.getElementById('loadingArea').innerHTML = '';
+
+                // Parser la reponse SSE
+                const dataLine = text.split('\n').find(l => l.startsWith('data: '));
+                if (!dataLine) {
+                    alert('Erreur: pas de reponse du serveur');
+                    return;
+                }
+                const raw = JSON.parse(dataLine.substring(6));
+
+                let result;
+                try {
+                    result = JSON.parse(raw[0]);
+                } catch (parseErr) {
+                    alert('Erreur de parsing: ' + raw[0]);
+                    return;
+                }
+
+                if (result.error) {
+                    alert('Erreur IA: ' + result.error);
+                    return;
+                }
+
+                // Mappage poubelle → clé DB
+                const bin = BIN_MAP[result.poubelle] || 'gray';
+                const data = DB[bin];
+                const objectName = result.objet_detecte || result.description.substring(0, 30) || 'Objet';
+
+                document.getElementById('aiResultArea').innerHTML = `
+                    <div class="result-card ${bin}">
+                        <button class="close-btn" onclick="document.getElementById('aiResultArea').innerHTML=''">X</button>
+                        <span class="ai-badge">&#128640; IA EcoScan</span>
+                        <div class="icon">${result.emoji || data.icon}</div>
+                        <div class="bin-name">${data.name}</div>
+                        <div class="tips">${result.conseil || data.tips.join(' | ')}</div>
+                    </div>
+                `;
+
+                HISTORY.unshift({ name: objectName, bin: bin, time: Date.now(), ai: true });
+                if (HISTORY.length > 20) HISTORY.pop();
+
+                STATS.total++;
+                STATS.aiTotal++;
+                if (bin !== 'gray' && bin !== 'orange') STATS.recyclable++;
+
+                if (SETTINGS.vibration && navigator.vibrate) navigator.vibrate(100);
+
+                saveData();
+                renderHistory();
+                renderStats();
+
+            } catch (e) {
+                document.getElementById('loadingArea').innerHTML = '';
+                alert('Erreur de connexion : ' + e.message + '\n\nVotre Space Hugging Face est-il en ligne ?');
+            }
+        }
+        
+        async function searchWithAI() {
+            const query = document.getElementById('textSearchInput').value.trim();
+            if (!query) {
+                alert('Ecrivez le nom d\'un objet');
+                return;
+            }
+            
+            document.getElementById('textLoadingArea').innerHTML = `
+                <div class="card" style="text-align:center">
+                    <div class="spinner"></div>
+                    <p>Analyse par IA...</p>
+                </div>
+            `;
+            document.getElementById('textResultArea').innerHTML = '';
+            
+            try {
+                const callResponse = await fetch(`${HF_SPACE_URL}/gradio_api/call/predict_text`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: [query] })
+                });
+                
+                const callData = await callResponse.json();
+                const eventId = callData.event_id;
+                
+                const resultResponse = await fetch(`${HF_SPACE_URL}/gradio_api/call/predict_text/${eventId}`);
+                const text = await resultResponse.text();
+                
+                document.getElementById('textLoadingArea').innerHTML = '';
+                
+                const dataLine = text.split('\n').find(l => l.startsWith('data: '));
+                if (!dataLine) {
+                    alert('Erreur: pas de reponse');
+                    return;
+                }
+                
+                const raw = JSON.parse(dataLine.substring(6));
+                let result;
+                try {
+                    result = JSON.parse(raw[0]);
+                } catch (parseErr) {
+                    result = { poubelle: raw[1], emoji: '&#128462;', conseil: raw[0] };
+                }
+                
+                const bin = BIN_MAP[result.poubelle] || 'gray';
+                const data = DB[bin];
+                
+                document.getElementById('textResultArea').innerHTML = `
+                    <div class="result-card ${bin}">
+                        <span class="ai-badge">&#128640; IA EcoScan</span>
+                        <div class="icon">${result.emoji || data.icon}</div>
+                        <div class="bin-name">${data.name}</div>
+                        <div class="tips">${result.conseil || data.tips.join(' | ')}</div>
+                    </div>
+                `;
+                
+                HISTORY.unshift({ name: query, bin: bin, time: Date.now(), ai: true });
+                if (HISTORY.length > 20) HISTORY.pop();
+                STATS.total++;
+                STATS.aiTotal++;
+                if (bin !== 'gray' && bin !== 'orange') STATS.recyclable++;
+                
+                if (SETTINGS.vibration && navigator.vibrate) navigator.vibrate(100);
+                saveData();
+                renderHistory();
+                renderStats();
+                
+            } catch (e) {
+                document.getElementById('textLoadingArea').innerHTML = '';
+                alert('Erreur: ' + e.message);
+            }
+        }
+        
+        function clearTextSearch() {
+            document.getElementById('textSearchInput').value = '';
+            document.getElementById('textLoadingArea').innerHTML = '';
+            document.getElementById('textResultArea').innerHTML = '';
+        }
+        
+        function clearHistory() {
+            if (confirm('Effacer tout l\'historique ?')) {
+                HISTORY = [];
+                STATS = { total: 0, aiTotal: 0, recyclable: 0 };
+                saveData();
+                renderHistory();
+                renderStats();
+            }
+        }
+        
+        function renderFilters() {
+            const colors = { all: '#4caf50', yellow: '#fff59d', blue: '#90caf9', green: '#a5d6a7', brown: '#bcaaa4', gray: '#bdbdbd', orange: '#ffcc80' };
+            const names = { all: 'Tous', yellow: 'Jaune', blue: 'Bleu', green: 'Vert', brown: 'Brun', gray: 'Gris', orange: 'Orange' };
+            document.getElementById('filterRow').innerHTML = Object.keys(DB).map(k => 
+                `<button class="filter-chip" style="background:${colors[k]};color:${k==='yellow'||k==='gray'||k==='brown'?'#333':'#fff'}" onclick="setFilter('${k}')">${names[k]}</button>`
+            ).join('');
+        }
+        
+        function setFilter(f) {
+            currentFilter = f;
+            renderObjects();
+        }
+        
+        function renderObjects(filter) {
+            let items = [];
+            if (currentFilter === 'all') {
+                for (const k of Object.keys(DB)) items.push(...DB[k].items.map(i => ({...i, bin: k})));
+            } else {
+                items = DB[currentFilter].items.map(i => ({...i, bin: currentFilter}));
+            }
+            if (filter) items = items.filter(i => i.n.toLowerCase().includes(filter));
+            
+            document.getElementById('objectsGrid').innerHTML = items.map(i => 
+                `<button class="object-btn" onclick="selectObject('${i.n}', '${i.bin}')">
+                    <div class="emoji">${i.e}</div>
+                    <div class="name">${i.n}</div>
+                </button>`
+            ).join('');
+        }
+        
+        function selectObject(name, bin) {
+            const data = DB[bin];
+            document.getElementById('resultArea').innerHTML = `
+                <div class="result-card ${bin}">
+                    <button class="close-btn" onclick="document.getElementById('resultArea').innerHTML=''">X</button>
+                    <div class="icon">${data.icon}</div>
+                    <div class="title">Objet selectionne</div>
+                    <div class="subtitle">${name}</div>
+                    <div class="bin-name">${data.name}</div>
+                    <div class="tips">${data.tips.join(' | ')}</div>
+                </div>
+            `;
+            
+            HISTORY.unshift({ name, bin, time: Date.now(), ai: false });
+            if (HISTORY.length > 20) HISTORY.pop();
+            
+            STATS.total++;
+            if (bin !== 'gray' && bin !== 'orange') STATS.recyclable++;
+            
+            if (SETTINGS.vibration && navigator.vibrate) navigator.vibrate(100);
+            
+            saveData();
+            renderHistory();
+            renderStats();
+        }
+        
+        function renderBins() {
+            document.getElementById('binsList').innerHTML = Object.entries(DB).map(([k, v]) => 
+                `<div class="bin-card ${v.color}" onclick="setFilter('${k}');showScreen('search')">
+                    <div class="icon">${v.icon}</div>
+                    <div>
+                        <div class="name">${v.name}</div>
+                        <div class="desc">${v.desc}</div>
+                    </div>
+                </div>`
+            ).join('');
+        }
+        
+        function renderHistory() {
+            if (HISTORY.length === 0) {
+                document.getElementById('historyList').innerHTML = '<p style="color:#888;text-align:center;font-size:12px">Aucun historique</p>';
+                return;
+            }
+            document.getElementById('historyList').innerHTML = HISTORY.map((h, i) => 
+                `<div class="history-item">
+                    <div class="icon">${DB[h.bin].icon}</div>
+                    <div class="info" onclick="selectObject('${h.name}', '${h.bin}')">
+                        <div class="name">${h.name} ${h.ai ? '<span class="ai-badge">IA</span>' : ''}</div>
+                        <div class="bin">${DB[h.bin].name}</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteHistoryItem(${i})">&#10006;</button>
+                </div>`
+            ).join('');
+        }
+        
+        function deleteHistoryItem(index) {
+            HISTORY.splice(index, 1);
+            saveData();
+            renderHistory();
+            renderStats();
+        }
+        
+        function renderStats() {
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-box"><div class="value">${STATS.total}</div><div class="label">Total</div></div>
+                <div class="stat-box"><div class="value">${STATS.aiTotal}</div><div class="label">IA</div></div>
+            `;
+        }
+        
+        function showScreen(name) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-' + name).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            if (name === 'history') renderHistory();
+            if (name === 'settings') renderStats();
+        }
+        
+        function toggleDark() {
+            SETTINGS.darkMode = !SETTINGS.darkMode;
+            updateToggles();
+            saveData();
+            if (SETTINGS.darkMode) {
+                document.body.style.background = '#1a1a2e';
+                document.body.style.color = '#e8f5e9';
+            } else {
+                document.body.style.background = 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)';
+                document.body.style.color = '#1b5e20';
+            }
+        }
+        
+        function toggleVibration() {
+            SETTINGS.vibration = !SETTINGS.vibration;
+            updateToggles();
+            saveData();
+        }
+        
+        function updateToggles() {
+            document.getElementById('toggleDark').className = 'toggle' + (SETTINGS.darkMode ? ' on' : '');
+            document.getElementById('toggleVibration').className = 'toggle' + (SETTINGS.vibration ? ' on' : '');
+        }
+        
+        function exportData() {
+            const data = { settings: SETTINGS, history: HISTORY, stats: STATS };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'ecoscan_data.json';
+            a.click();
+        }
+        
+        init();
+    </script>
+</body>
+</html>
