@@ -111,6 +111,17 @@
             return foundBin;
         }
         
+        function showResult(bin, containerId) {
+            const binData = BINS[bin];
+            document.getElementById(containerId).innerHTML = 
+                '<div class="result ' + bin + '">' +
+                '<button class="close-btn" onclick="this.parentElement.remove()">&#10006;</button>' +
+                '<div class="icon">' + binData.icon + '</div>' +
+                '<div class="name">' + binData.name + '</div>' +
+                '<div class="tips">' + binData.tips + '</div>' +
+                '</div>';
+        }
+        
         function search(text) {
             const bin = simpleSearch(text);
             showResult(bin, 'resultArea');
