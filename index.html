@@ -184,67 +184,48 @@
             const uploadArea = document.getElementById('uploadArea');
             const photoResult = document.getElementById('photoResult');
             
-            uploadArea.innerHTML = '<div class="spinner"></div><p>Envoi vers IA...</p>';
+            uploadArea.innerHTML = '<div class="spinner"></div><p>Analyse IA...</p>';
             
-            const formData = new FormData();
-            formData.append('files', file);
-            
-            const timeoutId = setTimeout(function() {
-                uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
-                photoResult.innerHTML = '<p style="color:#f57c00;font-size:13px">Service photo temporairement indisponible.<br>Utilisez la recherche texte.</p>';
-            }, 15000);
-            
-            fetch('https://rafnotrat-projet-svt.hf.space/gradio_api/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (!data || !data[0]) throw new Error('Upload failed');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result.split(',')[1];
                 
-                return fetch('https://rafnotrat-projet-svt.hf.space/gradio_api/call/predict', {
+                const timeoutId = setTimeout(function() {
+                    uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
+                    photoResult.innerHTML = '<p style="color:#f57c00;font-size:13px">IA trop lente. Utilisez le texte.</p>';
+                }, 10000);
+                
+                fetch('https://api-inference.huggingface.co/models/microsoft/resnet-50', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data: [{ path: data[0] }] })
-                });
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (!data || !data.event_id) throw new Error('Call failed');
-                return fetch('https://rafnotrat-projet-svt.hf.space/gradio_api/call/predict/' + data.event_id);
-            })
-            .then(function(r) { return r.text(); })
-            .then(function(text) {
-                clearTimeout(timeoutId);
-                const lines = text.split('\n');
-                for (const line of lines) {
-                    if (line.indexOf('data:') !== -1) {
-                        try {
-                            const raw = JSON.parse(line.replace('data:', ''));
-                            const result = raw[0] || raw;
-                            
-                            let bin = 'gris';
-                            if (result.indexOf('Jaune') !== -1) bin = 'jaune';
-                            else if (result.indexOf('Bleu') !== -1) bin = 'bleu';
-                            else if (result.indexOf('Vert') !== -1) bin = 'vert';
-                            else if (result.indexOf('Brun') !== -1) bin = 'brun';
-                            else if (result.indexOf('Orange') !== -1) bin = 'orange';
-                            else if (result.indexOf('Gris') !== -1) bin = 'gris';
-                            
-                            uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
-                            showResult(bin, 'photoResult');
-                            return;
-                        } catch(e) {}
+                    body: JSON.stringify({ inputs: base64 })
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    clearTimeout(timeoutId);
+                    
+                    let bin = 'gris';
+                    if (data && data.length > 0) {
+                        const label = (data[0] || '').label || '';
+                        const labelLower = label.toLowerCase();
+                        
+                        if (labelLower.includes('bottle') || labelLower.includes('can') || labelLower.includes('plastic') || labelLower.includes('container') || labelLower.includes('tray') || labelLower.includes('bag') || labelLower.includes('cup') || labelLower.includes('box') || labelLower.includes('package') || labelLower.includes('packet') || labelLower.includes('jar') || labelLower.includes('tin') || labelLower.includes('carton') || labelLower.includes('metal')) bin = 'jaune';
+                        else if (labelLower.includes('paper') || labelLower.includes('book') || labelLower.includes('magazine') || labelLower.includes('newspaper') || labelLower.includes('notebook') || labelLower.includes('envelope') || labelLower.includes('cardboard') || labelLower.includes('poster')) bin = 'bleu';
+                        else if (labelLower.includes('glass') || labelLower.includes('vase') || labelLower.includes('flask')) bin = 'vert';
+                        else if (labelLower.includes('banana') || labelLower.includes('apple') || labelLower.includes('fruit') || labelLower.includes('vegetable') || labelLower.includes('bread') || labelLower.includes('cheese') || labelLower.includes('egg') || labelLower.includes('meat') || labelLower.includes('fish') || labelLower.includes('food') || labelLower.includes('pizza') || labelLower.includes('cake') || labelLower.includes('carrot') || labelLower.includes('broccoli')) bin = 'brun';
+                        else if (labelLower.includes('phone') || labelLower.includes('laptop') || labelLower.includes('computer') || labelLower.includes('keyboard') || labelLower.includes('monitor') || labelLower.includes('screen') || labelLower.includes('television') || labelLower.includes('battery') || labelLower.includes('lamp') || labelLower.includes('printer') || labelLower.includes('camera') || labelLower.includes('radio') || labelLower.includes('console') || labelLower.includes('remote')) bin = 'orange';
                     }
-                }
-                uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
-                photoResult.innerHTML = '<p style="color:#f57c00;font-size:13px">Essayez la recherche texte.</p>';
-            })
-            .catch(function(err) {
-                clearTimeout(timeoutId);
-                uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
-                photoResult.innerHTML = '<p style="color:#f57c00;font-size:13px">Service photo indisponible.<br>Utilisez la recherche texte.</p>';
-            });
+                    
+                    uploadArea.innerHTML = '<img src="' + e.target.result + '" alt="Preview">';
+                    showResult(bin, 'photoResult');
+                })
+                .catch(function(err) {
+                    clearTimeout(timeoutId);
+                    uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
+                    photoResult.innerHTML = '<p style="color:#f57c00;font-size:13px">Erreur IA. Utilisez le texte.</p>';
+                });
+            };
+            reader.readAsDataURL(file);
         });
     </script>
 </body>
