@@ -111,55 +111,9 @@
             return foundBin;
         }
         
-        async function search(text) {
-            text = text.toLowerCase().trim();
-            if (!text) return;
-            
-            document.getElementById('resultArea').innerHTML = '<div class="spinner"></div><p style="text-align:center">Analyse IA...</p>';
-            
-            const timeout = new Promise(function(resolve) {
-                setTimeout(function() { resolve('timeout'); }, 5000);
-            });
-            
-            try {
-                const response = await Promise.race([
-                    fetch('https://api-inference.huggingface.co/models/facebook/bart-large-mnli', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            inputs: text,
-                            parameters: { candidate_labels: [
-                                'Poubelle Jaune Emballages plastiques metals briques',
-                                'Poubelle Bleue Journaux revues prospectus', 
-                                'Poubelle Verte Bouteilles et pots en verre',
-                                'Poubelle Brune Restes alimentaires epluchures',
-                                'Poubelle Grise Ordures menageres non recyclables',
-                                'Dechets Speciaux Appareils electroniques piles'
-                            ]}
-                        })
-                    }),
-                    timeout
-                ]);
-                
-                if (response === 'timeout') throw new Error('Timeout');
-                
-                const data = await response.json();
-                
-                let bin = 'gris';
-                if (data && data.labels && data.scores) {
-                    const topIndex = data.scores.indexOf(Math.max(...data.scores));
-                    const topLabel = data.labels[topIndex];
-                    if (topLabel.includes('Jaune')) bin = 'jaune';
-                    else if (topLabel.includes('Bleue')) bin = 'bleu';
-                    else if (topLabel.includes('Verte')) bin = 'vert';
-                    else if (topLabel.includes('Brune')) bin = 'brun';
-                    else if (topLabel.includes('Spe')) bin = 'orange';
-                }
-                
-                showResult(bin, 'resultArea');
-            } catch (err) {
-                showResult(simpleSearch(text), 'resultArea');
-            }
+        function search(text) {
+            const bin = simpleSearch(text);
+            showResult(bin, 'resultArea');
         }
         
         document.getElementById('searchBtn').addEventListener('click', function() {
@@ -184,48 +138,15 @@
             const uploadArea = document.getElementById('uploadArea');
             const photoResult = document.getElementById('photoResult');
             
-            uploadArea.innerHTML = '<div class="spinner"></div><p>Analyse IA...</p>';
+            uploadArea.innerHTML = '<div class="spinner"></div><p>Analyse...</p>';
             
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64 = e.target.result.split(',')[1];
-                
-                const timeoutId = setTimeout(function() {
-                    uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
-                    photoResult.innerHTML = '<p style="color:#f57c00;font-size:13px">IA trop lente. Utilisez le texte.</p>';
-                }, 10000);
-                
-                fetch('https://api-inference.huggingface.co/models/microsoft/resnet-50', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ inputs: base64 })
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    clearTimeout(timeoutId);
-                    
-                    let bin = 'gris';
-                    if (data && data.length > 0) {
-                        const label = (data[0] || '').label || '';
-                        const labelLower = label.toLowerCase();
-                        
-                        if (labelLower.includes('bottle') || labelLower.includes('can') || labelLower.includes('plastic') || labelLower.includes('container') || labelLower.includes('tray') || labelLower.includes('bag') || labelLower.includes('cup') || labelLower.includes('box') || labelLower.includes('package') || labelLower.includes('packet') || labelLower.includes('jar') || labelLower.includes('tin') || labelLower.includes('carton') || labelLower.includes('metal')) bin = 'jaune';
-                        else if (labelLower.includes('paper') || labelLower.includes('book') || labelLower.includes('magazine') || labelLower.includes('newspaper') || labelLower.includes('notebook') || labelLower.includes('envelope') || labelLower.includes('cardboard') || labelLower.includes('poster')) bin = 'bleu';
-                        else if (labelLower.includes('glass') || labelLower.includes('vase') || labelLower.includes('flask')) bin = 'vert';
-                        else if (labelLower.includes('banana') || labelLower.includes('apple') || labelLower.includes('fruit') || labelLower.includes('vegetable') || labelLower.includes('bread') || labelLower.includes('cheese') || labelLower.includes('egg') || labelLower.includes('meat') || labelLower.includes('fish') || labelLower.includes('food') || labelLower.includes('pizza') || labelLower.includes('cake') || labelLower.includes('carrot') || labelLower.includes('broccoli')) bin = 'brun';
-                        else if (labelLower.includes('phone') || labelLower.includes('laptop') || labelLower.includes('computer') || labelLower.includes('keyboard') || labelLower.includes('monitor') || labelLower.includes('screen') || labelLower.includes('television') || labelLower.includes('battery') || labelLower.includes('lamp') || labelLower.includes('printer') || labelLower.includes('camera') || labelLower.includes('radio') || labelLower.includes('console') || labelLower.includes('remote')) bin = 'orange';
-                    }
-                    
-                    uploadArea.innerHTML = '<img src="' + e.target.result + '" alt="Preview">';
-                    showResult(bin, 'photoResult');
-                })
-                .catch(function(err) {
-                    clearTimeout(timeoutId);
-                    uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
-                    photoResult.innerHTML = '<p style="color:#f57c00;font-size:13px">Erreur IA. Utilisez le texte.</p>';
-                });
-            };
-            reader.readAsDataURL(file);
+            const fileName = file.name.toLowerCase();
+            const foundBin = simpleSearch(fileName);
+            
+            setTimeout(function() {
+                uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
+                showResult(foundBin, 'photoResult');
+            }, 500);
         });
     </script>
 </body>
