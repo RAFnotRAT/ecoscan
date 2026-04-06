@@ -18,9 +18,9 @@
         .upload .icon { font-size: 50px; }
         .upload p { color: #888; margin-top: 10px; }
         .upload img { max-width: 100%; border-radius: 10px; }
-        .result { background: white; border-radius: 20px; padding: 25px; text-align: center; margin-top: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: relative; }
-        .result .close-btn { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: none; border-radius: 50%; background: #f5f5f5; color: #888; font-size: 18px; cursor: pointer; }
-        .result .icon { font-size: 60px; }
+        .result { background: white; border-radius: 20px; padding: 25px; text-align: center; margin-top: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: relative; display: flex; flex-direction: column; align-items: center; }
+        .result .close-btn { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: none; border-radius: 50%; background: rgba(0,0,0,0.1); color: #888; font-size: 16px; cursor: pointer; }
+        .result .icon { font-size: 50px; margin: 0 auto; }
         .result .name { font-size: 22px; font-weight: bold; margin: 10px 0; }
         .result .tips { font-size: 13px; color: #888; font-style: italic; }
         .yellow { background: linear-gradient(135deg, #fff9c4, #fff176); border: 3px solid #fbc02d; }
@@ -65,20 +65,29 @@
         <div class="box">
             <h3>Exemples</h3>
             <div class="examples">
-                <div class="example" data-item="bouteille"><div class="emoji">&#128154;</div><div class="name">Bouteille</div></div>
+                <div class="example" data-item="bouteille"><div class="emoji">&#129380;</div><div class="name">Bouteille</div></div>
                 <div class="example" data-item="journal"><div class="emoji">&#128240;</div><div class="name">Journal</div></div>
                 <div class="example" data-item="stylo"><div class="emoji">&#128394;</div><div class="name">Stylo</div></div>
                 <div class="example" data-item="banane"><div class="emoji">&#127822;</div><div class="name">Banane</div></div>
                 <div class="example" data-item="telephone"><div class="emoji">&#128241;</div><div class="name">Telephone</div></div>
-                <div class="example" data-item="verre"><div class="emoji">&#128154;</div><div class="name">Verre</div></div>
+                <div class="example" data-item="verre"><div class="emoji">&#127847;</div><div class="name">Verre</div></div>
             </div>
         </div>
         
-        <div class="footer">EcoScan - Projet SVT</div>
+        <div class="footer">
+            <div>EcoScan - Projet SVT</div>
+            <div style="margin-top:5px">
+                <a href="https://instagram.com/raf_clrx" style="color:#888;font-size:10px;margin:0 8px;text-decoration:none">Instagram: @raf_clrx</a>
+                <span style="color:#888">|</span>
+                <a href="https://twitter.com/rafnotrat" style="color:#888;font-size:10px;margin:0 8px;text-decoration:none">Twitter: @rafnotrat</a>
+            </div>
+            <div style="margin-top:10px;font-size:9px;color:#aaa">
+                <a href='http://www.freevisitorcounters.com' style='color:#aaa;text-decoration:none'>Freevisitorcounters.com</a>
+                <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=32a945e638e8a8bdb305b988585827ac312cd28e'></script>
+                <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1530627/t/3"></script>
+            </div>
+        </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
     
     <script>
         const BINS = {
@@ -98,89 +107,6 @@
             gris: ['stylo', 'crayon', 'mouchoir', 'lingette', 'cigarette', 'megot', 'cendres', 'polystyrene', 'styrofoam', 'vaisselle', 'ceramique', 'miroir', 'jouet', 'cassette', 'briquet', 'gomme', 'masque', 'gant', 'chiffon', 'eponge', 'balai', 'poussiere', 'cheveux', 'ongle', 'Protection', 'nete', 'nettoyage', 'essuie', 'couteau', 'assiette', 'bol', 'verre cassé', 'casserole', 'ustensile'],
             orange: ['telephone', 'portable', 'smartphone', 'gsm', 'ordi', 'ordinateur', 'laptop', 'tablette', 'ipad', 'ecran', 'moniteur', 'clavier', 'souris', 'imprimante', 'chargeur', 'cable', 'usb', 'cle', 'disque', 'batterie', 'pile', 'haut-parleur', 'casque', 'ecouteur', 'radio', 'television', 'tv', 'dvd', 'console', 'manette', 'fer', 'lave-linge', 'frigo', 'refrigerateur', 'micro-ondes', 'four', 'aspirateur', 'lampe', 'ampoule', 'medicament', 'pilule', 'peinture', 'solvant', 'colle', 'pneu', 'matelas', 'canape', 'meuble', 'bois', 'tapis', 'textile', 'vetement', 'pantalon', 'chemise', 'pull', 'veste', 'manteau', 'chaussure', 'chaussette', 'casquette', 'chapeau', 'echarpe', 'rideau', 'couverture', 'drap', 'oreiller', 'couette', 'electronique', 'electromenager', 'mobilier', 'dangereux', 'vetements', 'chaussures']
         };
-        
-        const CLASS_TO_BIN = {
-            'egg': 'brun', 'banana': 'brun', 'apple': 'brun', 'orange': 'brun', 'lemon': 'brun', 'lime': 'brun',
-            'strawberry': 'brun', 'tomato': 'brun', 'bread': 'brun', 'cheese': 'brun', 'pizza': 'brun',
-            'pizza pie': 'brun', 'cake': 'brun', 'hamburger': 'brun', 'hotdog': 'brun', 'french fries': 'brun',
-            'meat': 'brun', 'fish': 'brun', 'seafood': 'brun', 'vegetable': 'brun', 'fruit': 'brun',
-            'watermelon': 'brun', 'peach': 'brun', 'pear': 'brun', 'grape': 'brun', 'cucumber': 'brun',
-            'broccoli': 'brun', 'carrot': 'brun', 'corn': 'brun', 'mushroom': 'brun', 'head': 'brun',
-            'bagel': 'brun', 'muffin': 'brun', 'pretzel': 'brun', 'burrito': 'brun', 'taco': 'brun',
-            'meat loaf': 'brun', 'chocolate': 'brun', 'cookie': 'brun', 'dough': 'brun', 'ring': 'brun',
-            
-            'water bottle': 'jaune', 'plastic bag': 'jaune', 'can': 'jaune', 'tin can': 'jaune',
-            'container': 'jaune', 'tray': 'jaune', 'jar': 'jaune', 'shampoo': 'jaune',
-            'soap': 'jaune', 'detergent': 'jaune', 'lotion': 'jaune', 'tube': 'jaune',
-            'cup': 'jaune', 'box': 'jaune', 'carton': 'jaune', 'milk carton': 'jaune',
-            'juice': 'jaune', 'brick': 'jaune', 'brick': 'jaune', 'packet': 'jaune',
-            'package': 'jaune', 'wrapping': 'jaune', 'sachet': 'jaune', 'flask': 'jaune',
-            'pill bottle': 'jaune', 'soda can': 'jaune', 'beverage': 'jaune',
-            
-            'book': 'bleu', 'notebook': 'bleu', 'magazine': 'bleu', 'newspaper': 'bleu',
-            'envelope': 'bleu', 'paper': 'bleu', 'letter': 'bleu', 'mail': 'bleu',
-            'comic': 'bleu', 'textbook': 'bleu', 'brochure': 'bleu', 'flyer': 'bleu',
-            'catalogue': 'bleu', 'directory': 'bleu', 'cardboard': 'bleu', 'poster': 'bleu',
-            'file': 'bleu', 'folder': 'bleu', 'clipboard': 'bleu', 'map': 'bleu',
-            'newspaper': 'bleu', 'pad': 'bleu', 'scoreboard': 'bleu',
-            
-            'goblet': 'vert', 'wineglass': 'vert', 'vase': 'vert', 'drinking glass': 'vert',
-            'beer glass': 'vert', 'flute': 'vert', 'cocktail glass': 'vert', 'champagne flute': 'vert',
-            'jam': 'vert', 'jelly': 'vert', 'preserve': 'vert', 'honey': 'vert', 'syrup': 'vert',
-            'perfume': 'vert', 'cologne': 'vert', 'bottle': 'vert', 'wine bottle': 'vert',
-            'beer bottle': 'vert', 'jars': 'vert', 'glass': 'vert', 'wine': 'vert',
-            'barrel': 'vert', 'watering can': 'vert',
-            
-            'cellular telephone': 'orange', 'laptop': 'orange', 'computer keyboard': 'orange',
-            'computer monitor': 'orange', 'printer': 'orange', 'television': 'orange', 'screen': 'orange',
-            'lamp': 'orange', 'light': 'orange', 'battery': 'orange', 'computer': 'orange',
-            'phone': 'orange', 'mobile phone': 'orange', 'tablet': 'orange', 'mouse': 'orange',
-            'cpu': 'orange', 'hard disc': 'orange', 'floppy disk': 'orange', 'cd': 'orange',
-            'dvd': 'orange', 'cassette': 'orange', 'speaker': 'orange', 'headphone': 'orange',
-            'microphone': 'orange', 'camera': 'orange', 'radio': 'orange', 'console': 'orange',
-            'remote control': 'orange', 'remote': 'orange', 'vacuum': 'orange', 'washer': 'orange',
-            'washing machine': 'orange', 'dryer': 'orange', 'microwave': 'orange', 'oven': 'orange',
-            'refrigerator': 'orange', 'dishwasher': 'orange', 'fan': 'orange', 'heater': 'orange',
-            'iron': 'orange', 'toaster': 'orange', 'blender': 'orange', 'mixer': 'orange',
-            'electric fan': 'orange', 'hair dryer': 'orange', 'toothbrush': 'orange',
-            
-            'pen': 'gris', 'pencil': 'gris', 'crayon': 'gris', 'marker': 'gris', 'highlighter': 'gris',
-            'tissue': 'gris', 'handkerchief': 'gris', 'cigarette': 'gris', 'lighter': 'gris',
-            'candle': 'gris', 'sponge': 'gris', 'mirror': 'gris', 'comb': 'gris',
-            'toothbrush': 'gris', 'razor': 'gris', 'blade': 'gris', 'towel': 'gris',
-            'washcloth': 'gris', 'mask': 'gris', 'glove': 'gris', 'rag': 'gris',
-            'dust': 'gris', 'ash': 'gris', 'ceramic': 'gris', 'porcelain': 'gris',
-            'plate': 'gris', 'bowl': 'gris', 'spoon': 'gris', 'fork': 'gris', 'knife': 'gris',
-            'cutlery': 'gris', 'mug': 'gris', 'cup': 'gris', 'saucer': 'gris',
-            'china': 'gris', 'earthenware': 'gris', 'stoneware': 'gris',
-            'toy': 'gris', 'doll': 'gris', 'ball': 'gris', 'puck': 'gris',
-            'remote': 'gris', 'controller': 'gris', 'game controller': 'gris',
-            'sock': 'gris', 'sandal': 'gris', 'shoe': 'gris', 'slipper': 'gris',
-            'running shoe': 'gris', 'clog': 'gris', 'loafer': 'gris', 'cleat': 'gris',
-            'diaper': 'gris', 'sanitary': 'gris', 'bandage': 'gris', 'cotton': 'gris',
-            'wick': 'gris', 'string': 'gris', 'rope': 'gris', 'rubber band': 'gris',
-            'bottlecap': 'gris', 'lollipop': 'gris', 'candy': 'gris', 'bubble': 'gris'
-        };
-        
-        let model = null;
-        let modelLoaded = false;
-        
-        async function loadModel() {
-            try {
-                document.getElementById('loadingText').textContent = 'Chargement IA...';
-                model = await mobilenet.load({ version: 2, alpha: 1.0 });
-                modelLoaded = true;
-                document.getElementById('loadingText').textContent = 'IA prete';
-                setTimeout(function() {
-                    document.getElementById('loadingText').textContent = '';
-                }, 2000);
-            } catch (e) {
-                document.getElementById('loadingText').textContent = 'IA non disponible';
-                modelLoaded = false;
-            }
-        }
-        
-        loadModel();
         
         function simpleSearch(text) {
             text = text.toLowerCase().trim();
@@ -204,34 +130,6 @@
             return foundBin;
         }
         
-        function classifyFromLabel(label) {
-            label = label.toLowerCase();
-            
-            if (CLASS_TO_BIN[label]) {
-                return CLASS_TO_BIN[label];
-            }
-            
-            for (const [key, bin] of Object.entries(CLASS_TO_BIN)) {
-                if (label.includes(key) || key.includes(label)) {
-                    return bin;
-                }
-            }
-            
-            if (label.includes('bottle') || label.includes('can') || label.includes('plastic') || label.includes('container') || label.includes('tray') || label.includes('bag') || label.includes('cup') || label.includes('box') || label.includes('package') || label.includes('packet') || label.includes('jar') || label.includes('tin') || label.includes('carton') || label.includes('metal') || label.includes('packaging') || label.includes('wrapper')) return 'jaune';
-            
-            if (label.includes('paper') || label.includes('book') || label.includes('magazine') || label.includes('newspaper') || label.includes('notebook') || label.includes('envelope') || label.includes('cardboard') || label.includes('poster') || label.includes('journal') || label.includes('print')) return 'bleu';
-            
-            if (label.includes('glass') || label.includes('vase') || label.includes('flask') || label.includes('bottle')) return 'vert';
-            
-            if (label.includes('banana') || label.includes('apple') || label.includes('fruit') || label.includes('vegetable') || label.includes('bread') || label.includes('cheese') || label.includes('egg') || label.includes('meat') || label.includes('fish') || label.includes('food') || label.includes('pizza') || label.includes('cake') || label.includes('carrot') || label.includes('broccoli') || label.includes('food') || label.includes('meal') || label.includes('chicken') || label.includes('beef') || label.includes('pork') || label.includes('salad') || label.includes('soup') || label.includes('vegetable') || label.includes('fruit') || label.includes('berry') || label.includes('citrus') || label.includes('melon') || label.includes('grape') || label.includes('peach') || label.includes('pear') || label.includes('plum') || label.includes('tomato') || label.includes('potato') || label.includes('onion') || label.includes('garlic') || label.includes('lemon') || label.includes('lime')) return 'brun';
-            
-            if (label.includes('phone') || label.includes('laptop') || label.includes('computer') || label.includes('keyboard') || label.includes('monitor') || label.includes('screen') || label.includes('television') || label.includes('battery') || label.includes('lamp') || label.includes('printer') || label.includes('camera') || label.includes('radio') || label.includes('console') || label.includes('remote') || label.includes('speaker') || label.includes('microphone') || label.includes('device') || label.includes('electronic') || label.includes('appliance') || label.includes('machine')) return 'orange';
-            
-            if (label.includes('pen') || label.includes('pencil') || label.includes('crayon') || label.includes('sock') || label.includes('shoe') || label.includes('glove') || label.includes('mask') || label.includes('towel') || label.includes('tissue') || label.includes('candle') || label.includes('ceramic') || label.includes('plate') || label.includes('bowl') || label.includes('spoon') || label.includes('fork') || label.includes('knife') || label.includes('mug') || label.includes('cup')) return 'gris';
-            
-            return 'gris';
-        }
-        
         function showResult(bin, containerId) {
             const binData = BINS[bin];
             document.getElementById(containerId).innerHTML = 
@@ -243,9 +141,59 @@
                 '</div>';
         }
         
-        function search(text) {
-            const bin = simpleSearch(text);
-            showResult(bin, 'resultArea');
+        async function search(text) {
+            text = text.toLowerCase().trim();
+            if (!text) return;
+            
+            document.getElementById('resultArea').innerHTML = '<div class="spinner"></div><p style="text-align:center">IA HuggingFace...</p>';
+            
+            const timeout = new Promise(function(resolve) {
+                setTimeout(function() { resolve('timeout'); }, 8000);
+            });
+            
+            try {
+                const response = await Promise.race([
+                    fetch('https://api-inference.huggingface.co/models/facebook/bart-large-mnli', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            inputs: text,
+                            parameters: { 
+                                candidate_labels: [
+                                    'Poubelle Jaune Emballages plastiques metals briques consignes',
+                                    'Poubelle Bleue Papier journaux revues',
+                                    'Poubelle Verte Verre bouteilles bocaux',
+                                    'Poubelle Brune Aliments restes organiques compost',
+                                    'Poubelle Grise Ordures menageres non recyclables',
+                                    'Dechets Speciaux Electronique dechetterie'
+                                ]
+                            }
+                        })
+                    }),
+                    timeout
+                ]);
+                
+                if (response === 'timeout') throw new Error('Timeout');
+                
+                const data = await response.json();
+                
+                let bin = 'gris';
+                if (data && data.labels && data.scores) {
+                    const topIndex = data.scores.indexOf(Math.max(...data.scores));
+                    const topLabel = data.labels[topIndex];
+                    
+                    if (topLabel.includes('Jaune')) bin = 'jaune';
+                    else if (topLabel.includes('Bleue')) bin = 'bleu';
+                    else if (topLabel.includes('Verte')) bin = 'vert';
+                    else if (topLabel.includes('Brune')) bin = 'brun';
+                    else if (topLabel.includes('Spe')) bin = 'orange';
+                }
+                
+                showResult(bin, 'resultArea');
+            } catch (err) {
+                const bin = simpleSearch(text);
+                showResult(bin, 'resultArea');
+            }
         }
         
         document.getElementById('searchBtn').addEventListener('click', function() {
@@ -263,54 +211,23 @@
             });
         });
         
-        document.getElementById('fileInput').addEventListener('change', async function() {
+        document.getElementById('fileInput').addEventListener('change', function() {
             const file = this.files[0];
             if (!file) return;
             
             const uploadArea = document.getElementById('uploadArea');
             const photoResult = document.getElementById('photoResult');
             
-            uploadArea.innerHTML = '<div class="spinner"></div><p>Analyse IA...</p>';
+            uploadArea.innerHTML = '<div class="spinner"></div><p>Analyse...</p>';
             photoResult.innerHTML = '';
-            
-            const imageUrl = URL.createObjectURL(file);
-            
-            if (modelLoaded && model) {
-                try {
-                    const img = new Image();
-                    img.crossOrigin = 'anonymous';
-                    img.src = imageUrl;
-                    
-                    await new Promise(function(resolve, reject) {
-                        img.onload = resolve;
-                        img.onerror = reject;
-                        setTimeout(reject, 15000);
-                    });
-                    
-                    const predictions = await model.classify(img);
-                    
-                    if (predictions && predictions.length > 0) {
-                        let bin = 'gris';
-                        
-                        for (const pred of predictions) {
-                            const label = pred.className.toLowerCase();
-                            bin = classifyFromLabel(label);
-                            if (bin !== 'gris') break;
-                        }
-                        
-                        uploadArea.innerHTML = '<img src="' + imageUrl + '" alt="Preview">';
-                        showResult(bin, 'photoResult');
-                        return;
-                    }
-                } catch (e) {
-                    console.log('Model classification failed:', e);
-                }
-            }
             
             const fileName = file.name.toLowerCase();
             const bin = simpleSearch(fileName);
-            uploadArea.innerHTML = '<img src="' + imageUrl + '" alt="Preview">';
-            showResult(bin, 'photoResult');
+            
+            setTimeout(function() {
+                uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
+                showResult(bin, 'photoResult');
+            }, 500);
         });
     </script>
 </body>
