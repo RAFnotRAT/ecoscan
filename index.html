@@ -96,34 +96,36 @@
         };
         
         const WORDS = {
-            jaune: ['bouteille', 'plastique', 'canette', 'conserve', 'sac', 'emballage', 'carton', 'metal', 'aluminium', 'film', 'gobelet', 'pot', 'barquette', 'brique', 'couvercle', 'dosette', 'shampoing', 'gel', 'lessive', 'detergent', 'nettoyant', 'flacon', 'bidon', 'boite', 'tube', 'sachet', 'paquet', 'aerosol', 'spray', 'desodorisant', 'liquide', 'produit', 'bouchon', 'emball', 'metaux', 'acier', 'fer', 'couvercle', 'couchette'],
-            bleu: ['journal', 'magazine', 'papier', 'livre', 'cahier', 'enveloppe', 'prospectus', 'catalogue', 'revue', 'quotidien', 'presse', 'imprime', 'feuille', 'document', 'courrier', 'lettre', 'carte', 'poster', 'brochure', 'depliant', 'flyer', 'ramette'],
-            vert: ['verre', 'bouteille', 'vin', 'biere', 'bocal', 'pot', 'flacon', 'parfum', 'confiture', 'miel', 'sirop', 'vase', 'carafe', 'glace', 'verrerie', 'vitrage'],
-            brun: ['banane', 'pomme', 'orange', 'fruit', 'legume', 'epluchure', 'pelure', 'pain', 'fromage', 'oeuf', 'coquille', 'viande', 'poisson', 'volaille', 'restes', 'repas', 'cafe', 'the', 'aliment', 'nourriture', 'feuille', 'herbe', 'plante', 'fleur', 'tige', 'branche', 'ecorce', 'compost', 'organique', 'biodgradable', 'dechet', 'bio', 'pizza', 'gateau', 'pates', 'riz', 'viande', 'poulet', 'porc', 'boeuf', 'salade', 'carotte', 'brocoli', 'oignon', 'ail', 'patate', 'tomate', 'concombre', 'citron', 'fraise', 'raisin', 'cerise', 'pêche', 'melon', 'pasteque'],
-            gris: ['stylo', 'crayon', 'mouchoir', 'lingette', 'cigarette', 'megot', 'cendres', 'polystyrene', 'styrofoam', 'vaisselle', 'ceramique', 'miroir', 'jouet', 'cassette', 'briquet', 'gomme', 'masque', 'gant', 'chiffon', 'eponge', 'balai', 'poussiere', 'cheveux', 'ongle', 'Protection', 'nete', 'nettoyage', 'essuie', 'couteau', 'assiette', 'bol', 'verre cassé', 'casserole', 'ustensile'],
-            orange: ['telephone', 'portable', 'smartphone', 'gsm', 'ordi', 'ordinateur', 'laptop', 'tablette', 'ipad', 'ecran', 'moniteur', 'clavier', 'souris', 'imprimante', 'chargeur', 'cable', 'usb', 'cle', 'disque', 'batterie', 'pile', 'haut-parleur', 'casque', 'ecouteur', 'radio', 'television', 'tv', 'dvd', 'console', 'manette', 'fer', 'lave-linge', 'frigo', 'refrigerateur', 'micro-ondes', 'four', 'aspirateur', 'lampe', 'ampoule', 'medicament', 'pilule', 'peinture', 'solvant', 'colle', 'pneu', 'matelas', 'canape', 'meuble', 'bois', 'tapis', 'textile', 'vetement', 'pantalon', 'chemise', 'pull', 'veste', 'manteau', 'chaussure', 'chaussette', 'casquette', 'chapeau', 'echarpe', 'rideau', 'couverture', 'drap', 'oreiller', 'couette', 'electronique', 'electromenager', 'mobilier', 'dangereux', 'vetements', 'chaussures']
+            jaune: ['bouteille', 'bouteille plastique', 'bouteille eau', 'bouteille soda', 'canette', 'conserva', 'sac plastique', 'emball', 'carton', 'metal', 'metaux', 'aluminium', 'acier', 'fer', 'film', 'gobelet', 'pot', 'barquette', 'brique', 'couvercle', 'dosette', 'capsula', 'shampoing', 'gel', 'lessive', 'detergent', 'nettoyant', 'flacon', 'bidon', 'boite', 'tube', 'sachet', 'paquet', 'emballag', 'aerosol', 'spray', 'desodorisant', 'liquide', 'produit', 'bouchon', 'packaging', 'plastique', 'pack', 'gobelet', 'couchette', 'jug', 'baril', 'seau', 'huile', 'moutarde', 'ketchup', 'mayonnaise', 'yaourt', 'yoghurt', 'cereales', 'chocolat', 'biscuit', 'cookie', 'chips', 'chips', 'surgele', 'sardine', 'thon', 'mais', 'haricot', 'soupe', 'pates', 'riz', 'jus', 'lait', 'brick', 'shampoing', 'savon', 'droguerie'],
+            bleu: ['journal', 'magazine', 'papier', 'livre', 'cahier', 'enveloppe', 'prospectus', 'catalogue', 'revue', 'quotidien', 'presse', 'imprime', 'feuille', 'document', 'courrier', 'lettre', 'carte', 'poster', 'brochure', 'depliant', 'flyer', 'ramette', 'livra', 'carnet', 'bloc', 'note', 'revue', 'quotidien', 'bande dessinee', 'bd', 'comics', 'manuel', 'encyclopedie', 'dictionnaire', 'annuaire', 'guide', 'calendrier', 'carte mere', 'carte.postale'],
+            vert: ['verre', 'bouteille', 'bouteille vin', 'bouteille biere', 'vin', 'biere', 'bocal', 'flacon', 'parfum', 'confiture', 'miel', 'sirop', 'vase', 'carafe', 'glace', 'verrerie', 'vitrage', 'gobelet', 'verre vin', 'verre biere', 'flute', 'cocktail', 'champagne', 'marmelade', 'compote', 'confit', 'gelifie', 'arome', 'essence'],
+            brun: ['banane', 'pomme', 'orange', 'citron', 'fruit', 'fruits', 'legume', 'legumes', 'epluchure', 'pelure', 'peau', 'pain', 'fromage', 'oeuf', 'coquille', 'coquillage', 'viande', 'poisson', 'volaille', 'restes', 'repas', 'cafe', 'the', 'café', 'thé', 'aliment', 'nourriture', 'feuille', 'herbe', 'plante', 'fleur', 'tige', 'branche', 'ecorce', 'compost', 'organique', 'biodgradable', 'dechet', 'bio', 'pizza', 'gateau', 'gateaux', 'pates', 'patte', 'riz', 'poulet', 'porc', 'boeuf', 'agneau', 'salade', 'carotte', 'brocoli', 'oignon', 'ail', 'patate', 'tomate', 'concombre', 'fraise', 'raisin', 'cerise', 'peche', 'melon', 'pasteque', 'pasteque', 'muffin', 'croissant', 'baguette', 'brioche', 'beurre', 'creme', 'lait', 'yaourt', 'glace', 'sorbet', 'charcuterie', 'jambon', 'saucisse', 'bacon', 'tabac', 'cigarette', 'megot', 'terre', 'sol', 'jardin', 'terreau', 'engrais', 'naturel', 'vert'],
+            gris: ['stylo', 'crayon', 'crayon couleur', 'feutre', 'surligneur', 'marqueur', 'mouchoir', 'lingette', 'lingette hygiene', 'cigarette', 'cendres', 'cendre', 'polystyrene', 'styrofoam', 'mousse', 'vaisselle', 'ceramique', 'miroir', 'jouet', 'cassette', 'video', 'briquet', 'gomme', 'eraser', 'masque', 'gant', 'chiffon', 'eponge', 'balai', 'poussiere', 'cheveux', 'ongle', 'Protection', 'nete', 'nettoyage', 'essuie', 'couteau', 'couteaux', 'assiette', 'bol', 'casserole', 'ustensile', 'casser', 'casse', 'broken', 'porcelaine', 'faience', 'verre cassé', 'shard', 'choc', 'dommage'],
+            orange: ['telephone', 'portable', 'smartphone', 'gsm', 'mobile', 'ordi', 'ordinateur', 'laptop', 'tablette', 'ipad', 'ecran', 'moniteur', 'clavier', 'souris', 'imprimante', 'chargeur', 'cable', 'usb', 'cle usb', 'disque', 'batterie', 'pile', 'haut-parleur', 'casque', 'ecouteur', 'radio', 'television', 'tv', 'dvd', 'cd', 'console', 'manette', 'gamepad', 'fer repasser', 'lave-linge', 'frigo', 'refrigerateur', 'refrigerateur-cong', 'micro-ondes', 'micro onde', 'four', 'aspirateur', 'lampe', 'ampoule', 'led', 'neon', 'halogene', 'medicament', 'pilule', 'comprime', 'ordonnance', 'peinture', 'solvant', 'diluant', 'colle', 'adhésif', 'pneu', 'caoutchouc', 'matelas', 'canape', 'sofa', 'couch', 'meuble', 'bois', 'tapis', 'moquette', 'textile', 'vetement', 'pantalon', 'chemise', 'pull', 'veste', 'manteau', 'chaussure', 'chaussettes', 'casquette', 'chapeau', 'echarpe', 'foulard', 'rideau', 'couverture', 'drap', 'oreiller', 'couette', 'electronique', 'electromenager', 'mobilier', 'dangereux', 'vetements', 'vetement usag', 'chaussures usag', 'humidificateur', 'deshumidificateur', 'climatisation', 'clim', 'ventilateur', 'chauffage', 'radiateur', 'thermostat']
         };
         
         function simpleSearch(text) {
             text = text.toLowerCase().trim();
             if (!text) return 'gris';
             
-            let foundBin = 'gris';
-            let maxMatches = 0;
+            const checks = [
+                { bin: 'brun', words: ['banane', 'pomme', 'orange', 'citron', 'fruit', 'legume', 'epluchure', 'pelure', 'peau', 'pain', 'fromage', 'oeuf', 'viande', 'poisson', 'volaille', 'cafe', 'the', 'aliment', 'nourriture', 'feuille', 'herbe', 'plante', 'fleur', 'pizza', 'gateau', 'pates', 'riz', 'poulet', 'porc', 'boeuf', 'salade', 'carotte', 'brocoli', 'oignon', 'patate', 'tomate', 'concombre', 'fraise', 'raisin', 'restes', 'repas', 'compost', 'organique', 'bio', 'dechet', 'naturel', 'terreau', 'jardin', 'tabac', 'cigarette', 'megot'] },
+                { bin: 'jaune', words: ['bouteille', 'canette', 'sac plastique', 'emball', 'carton', 'metal', 'aluminium', 'acier', 'fer', 'plastique', 'film', 'gobelet', 'pot', 'barquette', 'brique', 'couvercle', 'dosette', 'shampoing', 'gel', 'lessive', 'detergent', 'flacon', 'bidon', 'boite', 'tube', 'sachet', 'paquet', 'aerosol', 'spray', 'bouchon', 'packaging', 'pack', 'huile', 'moutarde', 'ketchup', 'mayonnaise', 'yaourt', 'cereales', 'chocolat', 'biscuit', 'chips', 'surgele', 'sardine', 'thon', 'jus', 'lait', 'brick', 'savon', 'conserva'] },
+                { bin: 'bleu', words: ['journal', 'magazine', 'papier', 'livre', 'cahier', 'enveloppe', 'prospectus', 'catalogue', 'revue', 'feuille', 'document', 'courrier', 'lettre', 'poster', 'brochure', 'flyer', 'depliant', 'ramette', 'bloc', 'note', 'calendrier', 'carte postale', 'revue', 'quotidien', 'bande dessinee', 'bd', 'comics', 'manuel', 'dictionnaire', 'encyclopedie'] },
+                { bin: 'vert', words: ['verre', 'bouteille vin', 'bouteille biere', 'vin', 'biere', 'bocal', 'flacon', 'parfum', 'confiture', 'miel', 'sirop', 'vase', 'carafe', 'verrerie', 'vitrage', 'verre vin', 'flute', 'cocktail', 'champagne', 'marmelade', 'compote', 'gelifie'] },
+                { bin: 'orange', words: ['telephone', 'portable', 'smartphone', 'gsm', 'mobile', 'ordi', 'ordinateur', 'laptop', 'tablette', 'ipad', 'ecran', 'moniteur', 'clavier', 'souris', 'imprimante', 'chargeur', 'cable', 'usb', 'cle usb', 'disque dur', 'batterie', 'pile', 'casque', 'ecouteur', 'radio', 'television', 'tv', 'dvd', 'cd', 'console', 'manette', 'frigo', 'refrigerateur', 'micro-ondes', 'four', 'aspirateur', 'lampe', 'ampoule', 'medicament', 'pilule', 'peinture', 'solvant', 'colle', 'pneu', 'matelas', 'canape', 'meuble', 'bois', 'tapis', 'textile', 'vetement', 'pantalon', 'chemise', 'pull', 'veste', 'manteau', 'chaussure', 'chaussettes', 'rideau', 'couverture', 'drap', 'oreiller', 'electronique', 'electromenager', 'climatisation', 'clim', 'ventilateur', 'chauffage', 'humidificateur'] },
+                { bin: 'gris', words: ['stylo', 'crayon', 'feutre', 'surligneur', 'marqueur', 'mouchoir', 'lingette', 'cendres', 'cendre', 'polystyrene', 'styrofoam', 'mousse', 'vaisselle', 'ceramique', 'miroir', 'jouet', 'cassette', 'briquet', 'gomme', 'masque', 'gant', 'chiffon', 'eponge', 'balai', 'poussiere', 'cheveux', 'ongle', 'Protection', 'nete', 'nettoyage', 'essuie', 'couteau', 'assiette', 'bol', 'casserole', 'ustensile', 'casse', 'casser', 'porcelaine', 'faience', 'verre casse'] }
+            ];
             
-            for (const [bin, words] of Object.entries(WORDS)) {
-                let matchCount = 0;
-                for (const word of words) {
+            for (const check of checks) {
+                for (const word of check.words) {
                     if (text.includes(word) || word.includes(text)) {
-                        matchCount++;
+                        return check.bin;
                     }
                 }
-                if (matchCount > maxMatches) {
-                    maxMatches = matchCount;
-                    foundBin = bin;
-                }
             }
-            return foundBin;
+            
+            return 'gris';
         }
         
         function showResult(bin, containerId) {
@@ -207,6 +209,9 @@
             });
         });
         
+        const HF_SPACE_URL = "https://rafnotrat-projet-svt.hf.space";
+        const BIN_MAP = { 'Jaune': 'jaune', 'Bleu': 'bleu', 'Vert': 'vert', 'Brun': 'brun', 'Gris': 'gris', 'Orange': 'orange' };
+        
         document.getElementById('fileInput').addEventListener('change', function() {
             const file = this.files[0];
             if (!file) return;
@@ -214,16 +219,57 @@
             const uploadArea = document.getElementById('uploadArea');
             const photoResult = document.getElementById('photoResult');
             
-            uploadArea.innerHTML = '<div class="spinner"></div><p>Analyse...</p>';
+            uploadArea.innerHTML = '<div class="spinner"></div><p>Envoi vers IA...</p>';
             photoResult.innerHTML = '';
             
-            const fileName = file.name.toLowerCase();
-            const bin = simpleSearch(fileName);
+            const formData = new FormData();
+            formData.append('files', file);
             
-            setTimeout(function() {
+            fetch(HF_SPACE_URL + '/gradio_api/upload', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                if (!data || !data[0]) throw new Error('Upload failed');
+                return fetch(HF_SPACE_URL + '/gradio_api/call/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: [{ path: data[0] }] })
+                });
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (!data || !data.event_id) throw new Error('Call failed');
+                return fetch(HF_SPACE_URL + '/gradio_api/call/predict/' + data.event_id);
+            })
+            .then(r => r.text())
+            .then(text => {
+                const lines = text.split('\n');
+                for (const line of lines) {
+                    if (line.includes('data:')) {
+                        try {
+                            const raw = JSON.parse(line.replace('data:', ''));
+                            const result = typeof raw[0] === 'string' ? raw[0] : raw[0] || '';
+                            
+                            let bin = 'gris';
+                            if (result.includes('Jaune')) bin = 'jaune';
+                            else if (result.includes('Bleu')) bin = 'bleu';
+                            else if (result.includes('Vert')) bin = 'vert';
+                            else if (result.includes('Brun')) bin = 'brun';
+                            else if (result.includes('Orange')) bin = 'orange';
+                            else if (result.includes('Gris')) bin = 'gris';
+                            
+                            uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
+                            showResult(bin, 'photoResult');
+                            return;
+                        } catch(e) {}
+                    }
+                }
                 uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
-                showResult(bin, 'photoResult');
-            }, 500);
+                showResult('gris', 'photoResult');
+            })
+            .catch(err => {
+                uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
+                showResult(simpleSearch(file.name), 'photoResult');
+            });
         });
     </script>
 </body>
