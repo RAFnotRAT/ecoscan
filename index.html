@@ -87,43 +87,49 @@
             orange: { name: 'Dechets Speciaux', icon: '&#9888;', tips: 'Aller en dechetterie.' }
         };
         
-        const WORDS = {
-            jaune: ['bouteille', 'plastique', 'canette', 'conserve', 'sac', 'emballage', 'carton', 'metal', 'aluminium', 'film', 'gobelet', 'pot', 'barquette', 'brique', 'couvercle', 'dosette', 'shampoing', 'gel', 'lessive', 'detergent', 'nettoyant', 'flacon', 'bidon', 'boite', 'tube', 'sachet', 'paquet', 'aerosol', 'spray', 'desodorisant', 'liquide', 'produit', 'bouchon', 'plastique'],
-            bleu: ['journal', 'magazine', 'papier', 'livre', 'cahier', 'enveloppe', 'prospectus', 'catalogue', 'revue', 'quotidien', 'presse', 'imprime', 'feuille', 'document', 'courrier', 'lettre', 'carte', 'poster', 'brochure', 'depliant', 'flyer', 'journal'],
-            vert: ['verre', 'bouteille', 'vin', 'biere', 'bocal', 'pot', 'flacon', 'parfum', 'confiture', 'miel', 'sirop', 'vase', 'carafe', 'glace'],
-            brun: ['banane', 'pomme', 'orange', 'fruit', 'legume', 'epluchure', 'pelure', 'pain', 'fromage', 'oeuf', 'coquille', 'viande', 'poisson', 'volaille', 'restes', 'repas', 'cafe', 'the', 'aliment', 'nourriture', 'feuille', 'herbe', 'plante', 'fleur', 'tige', 'branche', 'ecorce', 'compost', 'organique', 'biodgradable'],
-            gris: ['stylo', 'crayon', 'mouchoir', 'lingette', 'cigarette', 'megot', 'cendres', 'polystyrene', 'styrofoam', 'vaisselle', 'ceramique', 'miroir', 'jouet', 'cassette', 'cassete', 'casse', 'briquet', 'megot', 'gomme', 'masque', 'gant', 'chiffon', 'eponge', 'balai', 'poussiere', 'cheveux', 'ongle', 'cendre', 'Protection'],
-            orange: ['telephone', 'portable', 'smartphone', 'gsm', 'ordi', 'ordinateur', 'laptop', 'tablette', 'ipad', 'ecran', 'moniteur', 'clavier', 'souris', 'imprimante', 'chargeur', 'cable', 'usb', 'cle', 'disque', 'batterie', 'pile', 'haut-parleur', 'casque', 'ecouteur', 'radio', 'television', 'tv', 'dvd', 'console', 'manette', 'fer', 'lave-linge', 'frigo', 'refrigerateur', 'micro-ondes', 'four', 'aspirateur', 'lampe', 'ampoule', 'medicament', 'pilule', 'peinture', 'solvant', 'colle', 'pneu', 'matelas', 'canape', 'meuble', 'bois', 'tapis', 'textile', 'vetement', 'pantalon', 'chemise', 'pull', 'veste', 'manteau', 'chaussure', 'chaussette', 'casquette', 'chapeau', 'echarpe', 'rideau', 'couverture', 'drap', 'oreiller', 'couette', 'lingette hygiene']
+        const CATEGORIES = {
+            jaune: 'Poubelle Jaune - Emballages plastiques, metals, briques',
+            bleu: 'Poubelle Bleue - Journaux, revues, prospectus',
+            vert: 'Poubelle Verte - Bouteilles et pots en verre',
+            brun: 'Poubelle Brune - Restes alimentaires, epluchures',
+            gris: 'Poubelle Grise - Ordures menageres non recyclables',
+            orange: 'Dechets Speciaux - Appareils electroniques, piles'
         };
         
-        function showResult(bin, containerId) {
-            const binData = BINS[bin];
-            document.getElementById(containerId).innerHTML = 
-                '<div class="result ' + bin + '">' +
-                '<button class="close-btn" onclick="this.parentElement.remove()">&#10006;</button>' +
-                '<div class="icon">' + binData.icon + '</div>' +
-                '<div class="name">' + binData.name + '</div>' +
-                '<div class="tips">' + binData.tips + '</div>' +
-                '</div>';
-        }
-        
-        function search(text) {
+        async function search(text) {
             text = text.toLowerCase().trim();
             if (!text) return;
             
-            let foundBin = 'gris';
+            document.getElementById('resultArea').innerHTML = '<div class="spinner"></div><p style="text-align:center">IA en cours...</p>';
             
-            for (const [bin, words] of Object.entries(WORDS)) {
-                for (const word of words) {
-                    if (text.includes(word) || word.includes(text)) {
-                        foundBin = bin;
-                        break;
-                    }
+            try {
+                const response = await fetch('https://api-inference.huggingface.co/models/facebook/bart-large-mnli', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        inputs: text,
+                        parameters: { candidate_labels: Object.values(CATEGORIES) }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                let bin = 'gris';
+                if (data && data.labels && data.scores) {
+                    const topIndex = data.scores.indexOf(Math.max(...data.scores));
+                    const topLabel = data.labels[topIndex];
+                    
+                    if (topLabel.includes('Jaune')) bin = 'jaune';
+                    else if (topLabel.includes('Bleue')) bin = 'bleu';
+                    else if (topLabel.includes('Verte')) bin = 'vert';
+                    else if (topLabel.includes('Brune')) bin = 'brun';
+                    else if (topLabel.includes('Speciale')) bin = 'orange';
                 }
-                if (foundBin !== 'gris') break;
+                
+                showResult(bin, 'resultArea');
+            } catch (err) {
+                showResult('gris', 'resultArea');
             }
-            
-            showResult(foundBin, 'resultArea');
         }
         
         document.getElementById('searchBtn').addEventListener('click', function() {
