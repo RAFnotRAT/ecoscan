@@ -87,30 +87,61 @@
             orange: { name: 'Dechets Speciaux', icon: '&#9888;', tips: 'Aller en dechetterie.' }
         };
         
-        const CATEGORIES = {
-            jaune: 'Poubelle Jaune - Emballages plastiques, metals, briques',
-            bleu: 'Poubelle Bleue - Journaux, revues, prospectus',
-            vert: 'Poubelle Verte - Bouteilles et pots en verre',
-            brun: 'Poubelle Brune - Restes alimentaires, epluchures',
-            gris: 'Poubelle Grise - Ordures menageres non recyclables',
-            orange: 'Dechets Speciaux - Appareils electroniques, piles'
+        const WORDS = {
+            jaune: ['bouteille', 'plastique', 'canette', 'conserve', 'sac', 'emballage', 'carton', 'metal', 'aluminium', 'film', 'gobelet', 'pot', 'barquette', 'brique', 'couvercle', 'dosette', 'shampoing', 'gel', 'lessive', 'detergent', 'nettoyant', 'flacon', 'bidon', 'boite', 'tube', 'sachet', 'paquet', 'aerosol', 'spray', 'desodorisant', 'liquide', 'produit', 'bouchon', 'plastique', 'emball', 'canette', 'metaux', 'acier', 'fer'],
+            bleu: ['journal', 'magazine', 'papier', 'livre', 'cahier', 'enveloppe', 'prospectus', 'catalogue', 'revue', 'quotidien', 'presse', 'imprime', 'feuille', 'document', 'courrier', 'lettre', 'carte', 'poster', 'brochure', 'depliant', 'flyer', 'journal', 'livre', 'cahier', 'ramette'],
+            vert: ['verre', 'bouteille', 'vin', 'biere', 'bocal', 'pot', 'flacon', 'parfum', 'confiture', 'miel', 'sirop', 'vase', 'carafe', 'glace', 'bouteille', 'verrerie', 'vitrage'],
+            brun: ['banane', 'pomme', 'orange', 'fruit', 'legume', 'epluchure', 'pelure', 'pain', 'fromage', 'oeuf', 'coquille', 'viande', 'poisson', 'volaille', 'restes', 'repas', 'cafe', 'the', 'aliment', 'nourriture', 'feuille', 'herbe', 'plante', 'fleur', 'tige', 'branche', 'ecorce', 'compost', 'organique', 'biodgradable', 'dechet', 'bio', 'dechets'],
+            gris: ['stylo', 'crayon', 'mouchoir', 'lingette', 'cigarette', 'megot', 'cendres', 'polystyrene', 'styrofoam', 'vaisselle', 'ceramique', 'miroir', 'jouet', 'cassette', 'cassete', 'casse', 'briquet', 'megot', 'gomme', 'masque', 'gant', 'chiffon', 'eponge', 'balai', 'poussiere', 'cheveux', 'ongle', 'cendre', 'Protection', 'nete', 'nettoyage', 'essuie'],
+            orange: ['telephone', 'portable', 'smartphone', 'gsm', 'ordi', 'ordinateur', 'laptop', 'tablette', 'ipad', 'ecran', 'moniteur', 'clavier', 'souris', 'imprimante', 'chargeur', 'cable', 'usb', 'cle', 'disque', 'batterie', 'pile', 'haut-parleur', 'casque', 'ecouteur', 'radio', 'television', 'tv', 'dvd', 'console', 'manette', 'fer', 'lave-linge', 'frigo', 'refrigerateur', 'micro-ondes', 'four', 'aspirateur', 'lampe', 'ampoule', 'medicament', 'pilule', 'peinture', 'solvant', 'colle', 'pneu', 'matelas', 'canape', 'meuble', 'bois', 'tapis', 'textile', 'vetement', 'pantalon', 'chemise', 'pull', 'veste', 'manteau', 'chaussure', 'chaussette', 'casquette', 'chapeau', 'echarpe', 'rideau', 'couverture', 'drap', 'oreiller', 'couette', 'lingette hygiene', 'electronique', 'electromenager', 'mobilier', 'dangereux']
         };
+        
+        function simpleSearch(text) {
+            text = text.toLowerCase().trim();
+            let foundBin = 'gris';
+            for (const [bin, words] of Object.entries(WORDS)) {
+                for (const word of words) {
+                    if (text.includes(word) || word.includes(text)) {
+                        foundBin = bin;
+                        break;
+                    }
+                }
+                if (foundBin !== 'gris') break;
+            }
+            return foundBin;
+        }
         
         async function search(text) {
             text = text.toLowerCase().trim();
             if (!text) return;
             
-            document.getElementById('resultArea').innerHTML = '<div class="spinner"></div><p style="text-align:center">IA en cours...</p>';
+            document.getElementById('resultArea').innerHTML = '<div class="spinner"></div><p style="text-align:center">Analyse IA...</p>';
+            
+            const timeout = new Promise(function(resolve) {
+                setTimeout(function() { resolve('timeout'); }, 5000);
+            });
             
             try {
-                const response = await fetch('https://api-inference.huggingface.co/models/facebook/bart-large-mnli', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        inputs: text,
-                        parameters: { candidate_labels: Object.values(CATEGORIES) }
-                    })
-                });
+                const response = await Promise.race([
+                    fetch('https://api-inference.huggingface.co/models/facebook/bart-large-mnli', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            inputs: text,
+                            parameters: { candidate_labels: [
+                                'Poubelle Jaune Emballages plastiques metals briques',
+                                'Poubelle Bleue Journaux revues prospectus', 
+                                'Poubelle Verte Bouteilles et pots en verre',
+                                'Poubelle Brune Restes alimentaires epluchures',
+                                'Poubelle Grise Ordures menageres non recyclables',
+                                'Dechets Speciaux Appareils electroniques piles'
+                            ]}
+                        })
+                    }),
+                    timeout
+                ]);
+                
+                if (response === 'timeout') throw new Error('Timeout');
                 
                 const data = await response.json();
                 
@@ -118,17 +149,16 @@
                 if (data && data.labels && data.scores) {
                     const topIndex = data.scores.indexOf(Math.max(...data.scores));
                     const topLabel = data.labels[topIndex];
-                    
                     if (topLabel.includes('Jaune')) bin = 'jaune';
                     else if (topLabel.includes('Bleue')) bin = 'bleu';
                     else if (topLabel.includes('Verte')) bin = 'vert';
                     else if (topLabel.includes('Brune')) bin = 'brun';
-                    else if (topLabel.includes('Speciale')) bin = 'orange';
+                    else if (topLabel.includes('Spe')) bin = 'orange';
                 }
                 
                 showResult(bin, 'resultArea');
             } catch (err) {
-                showResult('gris', 'resultArea');
+                showResult(simpleSearch(text), 'resultArea');
             }
         }
         
@@ -159,6 +189,11 @@
             const formData = new FormData();
             formData.append('files', file);
             
+            const timeoutId = setTimeout(function() {
+                uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
+                photoResult.innerHTML = '<p style="color:#f57c00;font-size:13px">Service photo temporairement indisponible.<br>Utilisez la recherche texte.</p>';
+            }, 15000);
+            
             fetch('https://rafnotrat-projet-svt.hf.space/gradio_api/upload', {
                 method: 'POST',
                 body: formData
@@ -180,31 +215,35 @@
             })
             .then(function(r) { return r.text(); })
             .then(function(text) {
+                clearTimeout(timeoutId);
                 const lines = text.split('\n');
                 for (const line of lines) {
                     if (line.indexOf('data:') !== -1) {
-                        const raw = JSON.parse(line.replace('data:', ''));
-                        const result = raw[0] || raw;
-                        
-                        let bin = 'gris';
-                        if (result.indexOf('Jaune') !== -1) bin = 'jaune';
-                        else if (result.indexOf('Bleu') !== -1) bin = 'bleu';
-                        else if (result.indexOf('Vert') !== -1) bin = 'vert';
-                        else if (result.indexOf('Brun') !== -1) bin = 'brun';
-                        else if (result.indexOf('Orange') !== -1) bin = 'orange';
-                        else if (result.indexOf('Gris') !== -1) bin = 'gris';
-                        
-                        uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
-                        showResult(bin, 'photoResult');
-                        return;
+                        try {
+                            const raw = JSON.parse(line.replace('data:', ''));
+                            const result = raw[0] || raw;
+                            
+                            let bin = 'gris';
+                            if (result.indexOf('Jaune') !== -1) bin = 'jaune';
+                            else if (result.indexOf('Bleu') !== -1) bin = 'bleu';
+                            else if (result.indexOf('Vert') !== -1) bin = 'vert';
+                            else if (result.indexOf('Brun') !== -1) bin = 'brun';
+                            else if (result.indexOf('Orange') !== -1) bin = 'orange';
+                            else if (result.indexOf('Gris') !== -1) bin = 'gris';
+                            
+                            uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
+                            showResult(bin, 'photoResult');
+                            return;
+                        } catch(e) {}
                     }
                 }
                 uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
-                photoResult.innerHTML = '<p style="color:red">Erreur</p>';
+                photoResult.innerHTML = '<p style="color:#f57c00;font-size:13px">Essayez la recherche texte.</p>';
             })
             .catch(function(err) {
+                clearTimeout(timeoutId);
                 uploadArea.innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
-                photoResult.innerHTML = '<p style="color:red">Erreur</p>';
+                photoResult.innerHTML = '<p style="color:#f57c00;font-size:13px">Service photo indisponible.<br>Utilisez la recherche texte.</p>';
             });
         });
     </script>
