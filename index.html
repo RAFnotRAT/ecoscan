@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#4caf50">
     <title>EcoScan - Tri Selectif</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,7 +26,7 @@
         .yellow { background: linear-gradient(135deg, #fff9c4, #fff176); border: 3px solid #fbc02d; }
         .blue { background: linear-gradient(135deg, #bbdefb, #90caf9); border: 3px solid #1976d2; }
         .green { background: linear-gradient(135deg, #c8e6c9, #a5d6a7); border: 3px solid #4caf50; }
-        .brown { background: linear-gradient(135deg, #d7ccc8, #bcaaa4); border: 3px solid #795548; color: white; }
+        .brown { background: linear-gradient(135deg, #d7ccc8, #bcaaa4); border: 3px solid #795548); }
         .gray { background: linear-gradient(135deg, #eceff1, #cfd8dc); border: 3px solid #607d8b; }
         .orange { background: linear-gradient(135deg, #ffe0b2, #ffcc80); border: 3px solid #f57c00; }
         .examples { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -38,6 +36,7 @@
         .footer { text-align: center; padding: 20px; color: #888; font-size: 12px; }
         .spinner { width: 40px; height: 40px; border: 4px solid #e0e0e0; border-top-color: #4caf50; border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { text-align: center; color: #888; margin-top: 10px; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -60,6 +59,7 @@
             </div>
             <input type="file" id="fileInput" accept="image/*" style="display:none">
             <div id="photoResult"></div>
+            <p class="loading-text" id="loadingText"></p>
         </div>
         
         <div class="box">
@@ -77,6 +77,9 @@
         <div class="footer">EcoScan - Projet SVT</div>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+    
     <script>
         const BINS = {
             jaune: { name: 'Poubelle Jaune', icon: '&#128462;', tips: 'Videz et aplatissez. Retirez les films.' },
@@ -88,27 +91,145 @@
         };
         
         const WORDS = {
-            jaune: ['bouteille', 'plastique', 'canette', 'conserve', 'sac', 'emballage', 'carton', 'metal', 'aluminium', 'film', 'gobelet', 'pot', 'barquette', 'brique', 'couvercle', 'dosette', 'shampoing', 'gel', 'lessive', 'detergent', 'nettoyant', 'flacon', 'bidon', 'boite', 'tube', 'sachet', 'paquet', 'aerosol', 'spray', 'desodorisant', 'liquide', 'produit', 'bouchon', 'plastique', 'emball', 'canette', 'metaux', 'acier', 'fer'],
-            bleu: ['journal', 'magazine', 'papier', 'livre', 'cahier', 'enveloppe', 'prospectus', 'catalogue', 'revue', 'quotidien', 'presse', 'imprime', 'feuille', 'document', 'courrier', 'lettre', 'carte', 'poster', 'brochure', 'depliant', 'flyer', 'journal', 'livre', 'cahier', 'ramette'],
-            vert: ['verre', 'bouteille', 'vin', 'biere', 'bocal', 'pot', 'flacon', 'parfum', 'confiture', 'miel', 'sirop', 'vase', 'carafe', 'glace', 'bouteille', 'verrerie', 'vitrage'],
-            brun: ['banane', 'pomme', 'orange', 'fruit', 'legume', 'epluchure', 'pelure', 'pain', 'fromage', 'oeuf', 'coquille', 'viande', 'poisson', 'volaille', 'restes', 'repas', 'cafe', 'the', 'aliment', 'nourriture', 'feuille', 'herbe', 'plante', 'fleur', 'tige', 'branche', 'ecorce', 'compost', 'organique', 'biodgradable', 'dechet', 'bio', 'dechets'],
-            gris: ['stylo', 'crayon', 'mouchoir', 'lingette', 'cigarette', 'megot', 'cendres', 'polystyrene', 'styrofoam', 'vaisselle', 'ceramique', 'miroir', 'jouet', 'cassette', 'cassete', 'casse', 'briquet', 'megot', 'gomme', 'masque', 'gant', 'chiffon', 'eponge', 'balai', 'poussiere', 'cheveux', 'ongle', 'cendre', 'Protection', 'nete', 'nettoyage', 'essuie'],
-            orange: ['telephone', 'portable', 'smartphone', 'gsm', 'ordi', 'ordinateur', 'laptop', 'tablette', 'ipad', 'ecran', 'moniteur', 'clavier', 'souris', 'imprimante', 'chargeur', 'cable', 'usb', 'cle', 'disque', 'batterie', 'pile', 'haut-parleur', 'casque', 'ecouteur', 'radio', 'television', 'tv', 'dvd', 'console', 'manette', 'fer', 'lave-linge', 'frigo', 'refrigerateur', 'micro-ondes', 'four', 'aspirateur', 'lampe', 'ampoule', 'medicament', 'pilule', 'peinture', 'solvant', 'colle', 'pneu', 'matelas', 'canape', 'meuble', 'bois', 'tapis', 'textile', 'vetement', 'pantalon', 'chemise', 'pull', 'veste', 'manteau', 'chaussure', 'chaussette', 'casquette', 'chapeau', 'echarpe', 'rideau', 'couverture', 'drap', 'oreiller', 'couette', 'lingette hygiene', 'electronique', 'electromenager', 'mobilier', 'dangereux']
+            jaune: ['bouteille', 'plastique', 'canette', 'conserve', 'sac', 'emballage', 'carton', 'metal', 'aluminium', 'film', 'gobelet', 'pot', 'barquette', 'brique', 'couvercle', 'dosette', 'shampoing', 'gel', 'lessive', 'detergent', 'nettoyant', 'flacon', 'bidon', 'boite', 'tube', 'sachet', 'paquet', 'aerosol', 'spray', 'desodorisant', 'liquide', 'produit', 'bouchon', 'emball', 'metaux', 'acier', 'fer', 'couvercle', 'couchette'],
+            bleu: ['journal', 'magazine', 'papier', 'livre', 'cahier', 'enveloppe', 'prospectus', 'catalogue', 'revue', 'quotidien', 'presse', 'imprime', 'feuille', 'document', 'courrier', 'lettre', 'carte', 'poster', 'brochure', 'depliant', 'flyer', 'ramette'],
+            vert: ['verre', 'bouteille', 'vin', 'biere', 'bocal', 'pot', 'flacon', 'parfum', 'confiture', 'miel', 'sirop', 'vase', 'carafe', 'glace', 'verrerie', 'vitrage'],
+            brun: ['banane', 'pomme', 'orange', 'fruit', 'legume', 'epluchure', 'pelure', 'pain', 'fromage', 'oeuf', 'coquille', 'viande', 'poisson', 'volaille', 'restes', 'repas', 'cafe', 'the', 'aliment', 'nourriture', 'feuille', 'herbe', 'plante', 'fleur', 'tige', 'branche', 'ecorce', 'compost', 'organique', 'biodgradable', 'dechet', 'bio', 'pizza', 'gateau', 'pates', 'riz', 'viande', 'poulet', 'porc', 'boeuf', 'salade', 'carotte', 'brocoli', 'oignon', 'ail', 'patate', 'tomate', 'concombre', 'citron', 'fraise', 'raisin', 'cerise', 'pêche', 'melon', 'pasteque'],
+            gris: ['stylo', 'crayon', 'mouchoir', 'lingette', 'cigarette', 'megot', 'cendres', 'polystyrene', 'styrofoam', 'vaisselle', 'ceramique', 'miroir', 'jouet', 'cassette', 'briquet', 'gomme', 'masque', 'gant', 'chiffon', 'eponge', 'balai', 'poussiere', 'cheveux', 'ongle', 'Protection', 'nete', 'nettoyage', 'essuie', 'couteau', 'assiette', 'bol', 'verre cassé', 'casserole', 'ustensile'],
+            orange: ['telephone', 'portable', 'smartphone', 'gsm', 'ordi', 'ordinateur', 'laptop', 'tablette', 'ipad', 'ecran', 'moniteur', 'clavier', 'souris', 'imprimante', 'chargeur', 'cable', 'usb', 'cle', 'disque', 'batterie', 'pile', 'haut-parleur', 'casque', 'ecouteur', 'radio', 'television', 'tv', 'dvd', 'console', 'manette', 'fer', 'lave-linge', 'frigo', 'refrigerateur', 'micro-ondes', 'four', 'aspirateur', 'lampe', 'ampoule', 'medicament', 'pilule', 'peinture', 'solvant', 'colle', 'pneu', 'matelas', 'canape', 'meuble', 'bois', 'tapis', 'textile', 'vetement', 'pantalon', 'chemise', 'pull', 'veste', 'manteau', 'chaussure', 'chaussette', 'casquette', 'chapeau', 'echarpe', 'rideau', 'couverture', 'drap', 'oreiller', 'couette', 'electronique', 'electromenager', 'mobilier', 'dangereux', 'vetements', 'chaussures']
         };
+        
+        const CLASS_TO_BIN = {
+            'egg': 'brun', 'banana': 'brun', 'apple': 'brun', 'orange': 'brun', 'lemon': 'brun', 'lime': 'brun',
+            'strawberry': 'brun', 'tomato': 'brun', 'bread': 'brun', 'cheese': 'brun', 'pizza': 'brun',
+            'pizza pie': 'brun', 'cake': 'brun', 'hamburger': 'brun', 'hotdog': 'brun', 'french fries': 'brun',
+            'meat': 'brun', 'fish': 'brun', 'seafood': 'brun', 'vegetable': 'brun', 'fruit': 'brun',
+            'watermelon': 'brun', 'peach': 'brun', 'pear': 'brun', 'grape': 'brun', 'cucumber': 'brun',
+            'broccoli': 'brun', 'carrot': 'brun', 'corn': 'brun', 'mushroom': 'brun', 'head': 'brun',
+            'bagel': 'brun', 'muffin': 'brun', 'pretzel': 'brun', 'burrito': 'brun', 'taco': 'brun',
+            'meat loaf': 'brun', 'chocolate': 'brun', 'cookie': 'brun', 'dough': 'brun', 'ring': 'brun',
+            
+            'water bottle': 'jaune', 'plastic bag': 'jaune', 'can': 'jaune', 'tin can': 'jaune',
+            'container': 'jaune', 'tray': 'jaune', 'jar': 'jaune', 'shampoo': 'jaune',
+            'soap': 'jaune', 'detergent': 'jaune', 'lotion': 'jaune', 'tube': 'jaune',
+            'cup': 'jaune', 'box': 'jaune', 'carton': 'jaune', 'milk carton': 'jaune',
+            'juice': 'jaune', 'brick': 'jaune', 'brick': 'jaune', 'packet': 'jaune',
+            'package': 'jaune', 'wrapping': 'jaune', 'sachet': 'jaune', 'flask': 'jaune',
+            'pill bottle': 'jaune', 'soda can': 'jaune', 'beverage': 'jaune',
+            
+            'book': 'bleu', 'notebook': 'bleu', 'magazine': 'bleu', 'newspaper': 'bleu',
+            'envelope': 'bleu', 'paper': 'bleu', 'letter': 'bleu', 'mail': 'bleu',
+            'comic': 'bleu', 'textbook': 'bleu', 'brochure': 'bleu', 'flyer': 'bleu',
+            'catalogue': 'bleu', 'directory': 'bleu', 'cardboard': 'bleu', 'poster': 'bleu',
+            'file': 'bleu', 'folder': 'bleu', 'clipboard': 'bleu', 'map': 'bleu',
+            'newspaper': 'bleu', 'pad': 'bleu', 'scoreboard': 'bleu',
+            
+            'goblet': 'vert', 'wineglass': 'vert', 'vase': 'vert', 'drinking glass': 'vert',
+            'beer glass': 'vert', 'flute': 'vert', 'cocktail glass': 'vert', 'champagne flute': 'vert',
+            'jam': 'vert', 'jelly': 'vert', 'preserve': 'vert', 'honey': 'vert', 'syrup': 'vert',
+            'perfume': 'vert', 'cologne': 'vert', 'bottle': 'vert', 'wine bottle': 'vert',
+            'beer bottle': 'vert', 'jars': 'vert', 'glass': 'vert', 'wine': 'vert',
+            'barrel': 'vert', 'watering can': 'vert',
+            
+            'cellular telephone': 'orange', 'laptop': 'orange', 'computer keyboard': 'orange',
+            'computer monitor': 'orange', 'printer': 'orange', 'television': 'orange', 'screen': 'orange',
+            'lamp': 'orange', 'light': 'orange', 'battery': 'orange', 'computer': 'orange',
+            'phone': 'orange', 'mobile phone': 'orange', 'tablet': 'orange', 'mouse': 'orange',
+            'cpu': 'orange', 'hard disc': 'orange', 'floppy disk': 'orange', 'cd': 'orange',
+            'dvd': 'orange', 'cassette': 'orange', 'speaker': 'orange', 'headphone': 'orange',
+            'microphone': 'orange', 'camera': 'orange', 'radio': 'orange', 'console': 'orange',
+            'remote control': 'orange', 'remote': 'orange', 'vacuum': 'orange', 'washer': 'orange',
+            'washing machine': 'orange', 'dryer': 'orange', 'microwave': 'orange', 'oven': 'orange',
+            'refrigerator': 'orange', 'dishwasher': 'orange', 'fan': 'orange', 'heater': 'orange',
+            'iron': 'orange', 'toaster': 'orange', 'blender': 'orange', 'mixer': 'orange',
+            'electric fan': 'orange', 'hair dryer': 'orange', 'toothbrush': 'orange',
+            
+            'pen': 'gris', 'pencil': 'gris', 'crayon': 'gris', 'marker': 'gris', 'highlighter': 'gris',
+            'tissue': 'gris', 'handkerchief': 'gris', 'cigarette': 'gris', 'lighter': 'gris',
+            'candle': 'gris', 'sponge': 'gris', 'mirror': 'gris', 'comb': 'gris',
+            'toothbrush': 'gris', 'razor': 'gris', 'blade': 'gris', 'towel': 'gris',
+            'washcloth': 'gris', 'mask': 'gris', 'glove': 'gris', 'rag': 'gris',
+            'dust': 'gris', 'ash': 'gris', 'ceramic': 'gris', 'porcelain': 'gris',
+            'plate': 'gris', 'bowl': 'gris', 'spoon': 'gris', 'fork': 'gris', 'knife': 'gris',
+            'cutlery': 'gris', 'mug': 'gris', 'cup': 'gris', 'saucer': 'gris',
+            'china': 'gris', 'earthenware': 'gris', 'stoneware': 'gris',
+            'toy': 'gris', 'doll': 'gris', 'ball': 'gris', 'puck': 'gris',
+            'remote': 'gris', 'controller': 'gris', 'game controller': 'gris',
+            'sock': 'gris', 'sandal': 'gris', 'shoe': 'gris', 'slipper': 'gris',
+            'running shoe': 'gris', 'clog': 'gris', 'loafer': 'gris', 'cleat': 'gris',
+            'diaper': 'gris', 'sanitary': 'gris', 'bandage': 'gris', 'cotton': 'gris',
+            'wick': 'gris', 'string': 'gris', 'rope': 'gris', 'rubber band': 'gris',
+            'bottlecap': 'gris', 'lollipop': 'gris', 'candy': 'gris', 'bubble': 'gris'
+        };
+        
+        let model = null;
+        let modelLoaded = false;
+        
+        async function loadModel() {
+            try {
+                document.getElementById('loadingText').textContent = 'Chargement IA...';
+                model = await mobilenet.load({ version: 2, alpha: 1.0 });
+                modelLoaded = true;
+                document.getElementById('loadingText').textContent = 'IA prete';
+                setTimeout(function() {
+                    document.getElementById('loadingText').textContent = '';
+                }, 2000);
+            } catch (e) {
+                document.getElementById('loadingText').textContent = 'IA non disponible';
+                modelLoaded = false;
+            }
+        }
+        
+        loadModel();
         
         function simpleSearch(text) {
             text = text.toLowerCase().trim();
+            if (!text) return 'gris';
+            
             let foundBin = 'gris';
+            let maxMatches = 0;
+            
             for (const [bin, words] of Object.entries(WORDS)) {
+                let matchCount = 0;
                 for (const word of words) {
                     if (text.includes(word) || word.includes(text)) {
-                        foundBin = bin;
-                        break;
+                        matchCount++;
                     }
                 }
-                if (foundBin !== 'gris') break;
+                if (matchCount > maxMatches) {
+                    maxMatches = matchCount;
+                    foundBin = bin;
+                }
             }
             return foundBin;
+        }
+        
+        function classifyFromLabel(label) {
+            label = label.toLowerCase();
+            
+            if (CLASS_TO_BIN[label]) {
+                return CLASS_TO_BIN[label];
+            }
+            
+            for (const [key, bin] of Object.entries(CLASS_TO_BIN)) {
+                if (label.includes(key) || key.includes(label)) {
+                    return bin;
+                }
+            }
+            
+            if (label.includes('bottle') || label.includes('can') || label.includes('plastic') || label.includes('container') || label.includes('tray') || label.includes('bag') || label.includes('cup') || label.includes('box') || label.includes('package') || label.includes('packet') || label.includes('jar') || label.includes('tin') || label.includes('carton') || label.includes('metal') || label.includes('packaging') || label.includes('wrapper')) return 'jaune';
+            
+            if (label.includes('paper') || label.includes('book') || label.includes('magazine') || label.includes('newspaper') || label.includes('notebook') || label.includes('envelope') || label.includes('cardboard') || label.includes('poster') || label.includes('journal') || label.includes('print')) return 'bleu';
+            
+            if (label.includes('glass') || label.includes('vase') || label.includes('flask') || label.includes('bottle')) return 'vert';
+            
+            if (label.includes('banana') || label.includes('apple') || label.includes('fruit') || label.includes('vegetable') || label.includes('bread') || label.includes('cheese') || label.includes('egg') || label.includes('meat') || label.includes('fish') || label.includes('food') || label.includes('pizza') || label.includes('cake') || label.includes('carrot') || label.includes('broccoli') || label.includes('food') || label.includes('meal') || label.includes('chicken') || label.includes('beef') || label.includes('pork') || label.includes('salad') || label.includes('soup') || label.includes('vegetable') || label.includes('fruit') || label.includes('berry') || label.includes('citrus') || label.includes('melon') || label.includes('grape') || label.includes('peach') || label.includes('pear') || label.includes('plum') || label.includes('tomato') || label.includes('potato') || label.includes('onion') || label.includes('garlic') || label.includes('lemon') || label.includes('lime')) return 'brun';
+            
+            if (label.includes('phone') || label.includes('laptop') || label.includes('computer') || label.includes('keyboard') || label.includes('monitor') || label.includes('screen') || label.includes('television') || label.includes('battery') || label.includes('lamp') || label.includes('printer') || label.includes('camera') || label.includes('radio') || label.includes('console') || label.includes('remote') || label.includes('speaker') || label.includes('microphone') || label.includes('device') || label.includes('electronic') || label.includes('appliance') || label.includes('machine')) return 'orange';
+            
+            if (label.includes('pen') || label.includes('pencil') || label.includes('crayon') || label.includes('sock') || label.includes('shoe') || label.includes('glove') || label.includes('mask') || label.includes('towel') || label.includes('tissue') || label.includes('candle') || label.includes('ceramic') || label.includes('plate') || label.includes('bowl') || label.includes('spoon') || label.includes('fork') || label.includes('knife') || label.includes('mug') || label.includes('cup')) return 'gris';
+            
+            return 'gris';
         }
         
         function showResult(bin, containerId) {
@@ -142,22 +263,54 @@
             });
         });
         
-        document.getElementById('fileInput').addEventListener('change', function() {
+        document.getElementById('fileInput').addEventListener('change', async function() {
             const file = this.files[0];
             if (!file) return;
             
             const uploadArea = document.getElementById('uploadArea');
             const photoResult = document.getElementById('photoResult');
             
-            uploadArea.innerHTML = '<div class="spinner"></div><p>Analyse...</p>';
+            uploadArea.innerHTML = '<div class="spinner"></div><p>Analyse IA...</p>';
+            photoResult.innerHTML = '';
+            
+            const imageUrl = URL.createObjectURL(file);
+            
+            if (modelLoaded && model) {
+                try {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.src = imageUrl;
+                    
+                    await new Promise(function(resolve, reject) {
+                        img.onload = resolve;
+                        img.onerror = reject;
+                        setTimeout(reject, 15000);
+                    });
+                    
+                    const predictions = await model.classify(img);
+                    
+                    if (predictions && predictions.length > 0) {
+                        let bin = 'gris';
+                        
+                        for (const pred of predictions) {
+                            const label = pred.className.toLowerCase();
+                            bin = classifyFromLabel(label);
+                            if (bin !== 'gris') break;
+                        }
+                        
+                        uploadArea.innerHTML = '<img src="' + imageUrl + '" alt="Preview">';
+                        showResult(bin, 'photoResult');
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Model classification failed:', e);
+                }
+            }
             
             const fileName = file.name.toLowerCase();
-            const foundBin = simpleSearch(fileName);
-            
-            setTimeout(function() {
-                uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
-                showResult(foundBin, 'photoResult');
-            }, 500);
+            const bin = simpleSearch(fileName);
+            uploadArea.innerHTML = '<img src="' + imageUrl + '" alt="Preview">';
+            showResult(bin, 'photoResult');
         });
     </script>
 </body>
