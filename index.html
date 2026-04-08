@@ -19,7 +19,7 @@
         .upload p { color: #888; margin-top: 10px; }
         .upload img { max-width: 100%; border-radius: 10px; }
         .result { background: white; border-radius: 20px; padding: 25px; text-align: center; margin-top: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: relative; display: flex; flex-direction: column; align-items: center; }
-        .result .close-btn { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: none; border-radius: 50%; background: rgba(0,0,0,0.1); color: #888; font-size: 16px; cursor: pointer; }
+        .result .close-btn { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: none; background: transparent; color: #888; font-size: 20px; cursor: pointer; }
         .result .icon { font-size: 50px; margin: 0 auto; }
         .result .name { font-size: 22px; font-weight: bold; margin: 10px 0; }
         .result .tips { font-size: 13px; color: #888; font-style: italic; }
@@ -53,7 +53,7 @@
         
         <div class="box">
             <h3>Ou envoie une photo</h3>
-            <div class="upload" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+            <div class="upload" id="uploadArea" style="position:relative" onclick="document.getElementById('fileInput').click()">
                 <div class="icon">&#128247;</div>
                 <p>Cliquez pour choisir une photo</p>
             </div>
@@ -137,6 +137,12 @@
                 '<div class="name">' + binData.name + '</div>' +
                 '<div class="tips">' + binData.tips + '</div>' +
                 '</div>';
+        }
+        
+        function resetPhoto() {
+            document.getElementById('uploadArea').innerHTML = '<div class="icon">&#128247;</div><p>Cliquez pour choisir une photo</p>';
+            document.getElementById('photoResult').innerHTML = '';
+            document.getElementById('fileInput').value = '';
         }
         
         async function search(text) {
@@ -257,18 +263,23 @@
                             else if (result.includes('Orange')) bin = 'orange';
                             else if (result.includes('Gris')) bin = 'gris';
                             
-                            uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
+                            uploadArea.innerHTML = '<div style="position:relative;display:inline-block;width:100%"><button onclick="this.parentElement.parentElement.innerHTML=\'<div class=icon>&#128247;</div><p>Cliquez pour choisir une photo</p>\';document.getElementById(\'photoResult\').innerHTML=\'\';" style="position:absolute;top:5px;right:5px;width:25px;height:25px;border:none;background:rgba(0,0,0,0.5);color:white;border-radius:50%;cursor:pointer;font-size:14px">&#10006;</button><img src="' + URL.createObjectURL(file) + '" alt="Preview" style="max-width:100%;border-radius:10px"></div>';
                             showResult(bin, 'photoResult');
                             return;
                         } catch(e) {}
                     }
                 }
-                uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
+                const closeBtn = '<button onclick="this.parentElement.parentElement.innerHTML=\'<div class=icon>&#128247;</div><p>Cliquez pour choisir une photo</p>\';document.getElementById(\'photoResult\').innerHTML=\'\';" style="position:absolute;top:5px;right:5px;width:25px;height:25px;border:none;background:rgba(0,0,0,0.5);color:white;border-radius:50%;cursor:pointer;font-size:14px">&#10006;</button>';
+                const imgWithClose = '<div style="position:relative;display:inline-block;width:100%">' + closeBtn + '<img src="' + URL.createObjectURL(file) + '" alt="Preview" style="max-width:100%;border-radius:10px"></div>';
+                
+                uploadArea.innerHTML = imgWithClose;
                 showResult('gris', 'photoResult');
             })
             .catch(err => {
-                uploadArea.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Preview">';
-                showResult(simpleSearch(file.name), 'photoResult');
+                console.log('Erreur:', err);
+                uploadArea.innerHTML = imgWithClose;
+                photoResult.innerHTML = '<p style="color:#f57c00;font-size:12px;text-align:center;margin-top:10px">IA momentanement indisponible.<br>Essayez avec la recherche texte.</p>';
+                setTimeout(() => photoResult.innerHTML = '', 5000);
             });
         });
     </script>
